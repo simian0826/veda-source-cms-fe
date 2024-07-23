@@ -1,0 +1,102 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ark-adms2-fe-svc
+  namespace: adms2-dev
+  labels:
+    app: ark-adms2-fe
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 80
+      name: web
+  selector:
+    app: ark-adms2-fe
+# ---
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: ark-adms2-fe-ingress
+#   namespace: adms2-dev
+#   annotations:
+#     nginx.ingress.kubernetes.io/rewrite-target: /$1
+# spec:
+#   ingressClassName: nginx
+#   rules:
+#     - host: adms2-dev.ftms.com.cn
+#       http:
+#         paths:
+#           - backend:
+#               service:
+#                 name: ark-adms2-fe-svc
+#                 port:
+#                   number: 80
+#             path: /gen2/(.*)
+#             pathType: ImplementationSpecific
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ark-adms2-fe-deploy
+  namespace: adms2-dev
+  labels:
+    app: ark-adms2-fe
+spec:
+  replicas: 1
+  strategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxSurge: 1
+    maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: ark-adms2-fe
+  template:
+    metadata:
+      labels:
+        app: ark-adms2-fe
+    spec:
+      containers:
+        - name: ark-adms2-fe
+          image: swr.cn-north-4.myhuaweicloud.com/swr-adms2-dev/ark-adms2-fe:{{GIT_TAG}}
+          resources:
+            limits:
+              cpu: "500m"
+              memory: 1Gi
+            requests:
+              cpu: "500m"
+              memory: 1Gi
+          env:
+            - name: TZ
+              value: Asia/Shanghai
+            - name: V_PROFILE
+              value: dev
+          ports:
+            - containerPort: 80
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 80
+              scheme: HTTP
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 10
+          lifecycle:
+            preStop:
+              exec:
+                command: [ "/bin/bash", "-c", "sleep 10" ]
+      terminationGracePeriodSeconds: 45
+      imagePullSecrets:
+        - name: codeup-demo-secret
+      tolerations:
+        - effect: NoSchedule
+          key: environment
+          operator: Equal
+          #容忍pod在sit环境中运行
+          value: adms2-dev
+      #节点选择器，运行时使pod调度到有 environment: dev 标签的节点中
+      nodeSelector:
+        environment: adms2-dev

@@ -1,0 +1,207 @@
+/**
+ * @Description: ant-design-vue 组件的个性化样式改造，应用到全局
+ * */
+
+// ---- 自定义特殊模块的全局弹窗样式，不会影响其他模块
+.local-modal-line-special-style {
+  .ant-modal-content {
+    width: 420px !important;
+  }
+
+  .ant-modal-confirm-title {
+    border-bottom: 1px solid #e8eaf3;
+    padding-left: 24px;
+    padding-bottom: 8px;
+  }
+
+  .ant-modal-confirm-content {
+    margin-block-start: 0 !important;
+    max-width: 100% !important;
+  }
+
+  .ant-modal-confirm-btns {
+    border-top: 1px solid #e8eaf3;
+    padding-top: 20px;
+    display: flex;
+    justify-content: center;
+    margin-top: 0;
+
+    .ant-btn-default {
+      display: none;
+    }
+  }
+
+  .ant-modal-content {
+    padding: 16px 0;
+    border-radius: 8px;
+  }
+
+}
+
+// ---------
+
+.ant-input {
+  // border-radius: 2px !important;
+  min-height: 36px;
+}
+
+.ant-input-affix-wrapper {
+  // border-radius: 2px !important;
+}
+
+.ant-select-selector {
+  // border-radius: 2px !important;
+  min-height: 36px !important;
+}
+// 单选样式调整 by qinjun
+.ant-select-single .ant-select-selector .ant-select-selection-placeholder, .ant-select-single .ant-select-selector .ant-select-selection-item {
+   height: 36px !important;
+   line-height: 36px !important;
+ }
+
+.ant-input-password {
+  min-height: 36px !important;
+
+  // border-radius: 2px !important;
+}
+
+.ant-select-dropdown .ant-select-item-option-active:not(.ant-select-item-option-disabled) {
+  background-color: rgba(21, 42, 140, 0.10);
+}
+
+.ant-select-dropdown .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+  color: rgba(21, 42, 140, 0.88);
+  font-weight: 600;
+  background-color: #E8EAF3;
+}
+
+
+// 次级筛选组件样式设置
+.secondary {
+  --br: 32px;
+
+  &.ant-input {
+    border-radius: var(--br) !important;
+  }
+
+  .ant-input {
+    border-radius: var(--br) !important;
+  }
+
+  &.ant-select-selector {
+    border-radius: var(--br) !important;
+  }
+
+  .ant-select-selector {
+    border-radius: var(--br) !important;
+  }
+
+  &.ant-picker {
+    border-radius: var(--br) !important;
+  }
+
+  .ant-picker {
+    border-radius: var(--br) !important;
+  }
+
+  &.ant-input-password {
+    border-radius: var(--br) !important;
+  }
+
+  .ant-input-password {
+    border-radius: var(--br) !important;
+  }
+}
+
+.ant-select-multiple {
+  .ant-select-selection-item {
+    .ant-select-selection-item-content {
+      color: #152a8c;
+    }
+
+    border: 1px solid #d0d4e8;
+    background: #e8eaf3;
+
+    .ant-select-selection-item-remove {
+      color: hwb(229 8% 45%);
+      color: hwb(229 8% 45%);
+    }
+  }
+}
+
+.ant-picker {
+  width: 100%;
+  border-radius: 2px !important;
+  height: 36px;
+}
+
+.ant-form-item {
+  margin-bottom: 25px;
+
+  .ant-form-item-label>label {
+    color: #000000;
+    font-size: 14px;
+    font-weight: 400;
+  }
+}
+
+// .ant-btn {
+//   padding: 4px 15px 4px 15px;
+//   border-radius: 2px;
+//   width: 80px;
+//   height: 36px;
+// }
+.ant-table-cell {
+  font-size: 14px;
+  font-weight: 400 !important;
+}
+.ant-table-cell-row-hover{
+  background-color: #E8EAF3 !important;
+}
+.modal-container {
+  .ant-modal-footer {
+    text-align: center;
+  }
+
+  .ant-modal-body {
+    padding: 30px 15px;
+    text-align: center;
+
+    .ant-select-selector {
+      min-width: 300px;
+    }
+  }
+}
+
+.ant-input-number .ant-input-number-input {
+  height: 36px;
+}
+
+.ant-input-number-disabled .ant-input-number-input {
+  color: rgba(0, 0, 0, 0.25) !important;
+}
+
+.ant-picker-ranges {
+  .ant-picker-ok {
+    margin-left: 4px !important;
+  }
+}
+
+.ant-input-number .ant-input-number-input {
+  height: 36px;
+}
+
+.ant-input-number-disabled .ant-input-number-input {
+  color: rgba(0, 0, 0, 0.25) !important;
+}
+
+.ant-picker-ranges {
+  .ant-picker-ok {
+    margin-left: 4px !important;
+  }
+}
+.ant-cascader-menu{
+  .ant-cascader-menu-item-active{
+    background-color: #E8EAF3 !important;
+  }
+}

@@ -1,0 +1,107 @@
+@prefix-cls: ~'@{namespace}-basic-menu';
+
+// fix table unnecessary scrollbar
+.@{prefix-cls} {
+
+
+  // {
+  //   &::after{
+  //     content: "";
+  //     width: 4px;
+  //     height: 100%;
+  //     position: absolute;
+  //     top: 0px;
+  //     right: 0px;
+  //     background-color: @primary-color;
+  //   }
+  // }
+
+  .ant-menu .ant-menu-item-selected, .ant-menu-item.ant-menu-item-selected.ant-menu-item-only-child {
+    // background-color: rgba(21, 42, 140, 0.10) !important;
+
+    // color: @primary-color !important;
+
+    &::after{
+      content: "";
+      width: 4px;
+      height: 100%;
+      position: absolute;
+      top: 0px;
+      right: 0px;
+      background-color: @primary-color;
+    }
+  }
+  
+  .ant-menu-item.ant-menu-item-only-child > .ant-menu-title-content, .ant-menu-item.ant-menu-item-selected.ant-menu-item-only-child > .ant-menu-title-content{
+    margin-left: 0px;
+  }
+
+ .ant-menu-submenu-title {
+    margin-inline: 0px;
+    padding-left: 24px !important;
+
+  }
+
+  .ant-menu-item.ant-menu-item-only-child{
+    padding-left: 24px !important;
+  }
+
+
+  :not(.ant-menu-submenu-inline) > .ant-menu-item.ant-menu-item-only-child > .ant-menu-title-content{
+    margin-block: 4px;
+    margin-inline: 4px;
+    margin-left: 2rem;
+
+  }
+
+  
+}
+
+  .ant-menu-inline > .ant-menu-item {
+    margin-inline: 0px;
+  }
+  .ant-menu-inline-collapsed > .ant-menu-submenu > .ant-menu-submenu-title{
+    margin-inline: 4px;
+  }
+  
+.ant-menu-inline .ant-menu-item{
+    margin-inline: 0px; 
+    margin-block: 0px;
+    border-radius: unset;
+    width: 100% !important;
+  }
+
+.ant-menu-light .ant-menu-submenu-title:hover:not(.ant-menu-item-selected):not(.ant-menu-submenu-selected) {
+  // color: @primary-color;
+  background-color:#fff !important;
+
+}
+
+.ant-menu-light.ant-menu-root.ant-menu-inline{
+  border-inline-end: unset;
+}
+.ant-menu-light.ant-menu-root.ant-menu-vertical{
+  border-inline-end: unset;
+
+}
+.ant-menu-light .ant-menu-submenu-selected >.ant-menu-submenu-title {
+  // color: @primary-color !important; 
+  font-weight: bold;
+}
+
+.ant-menu-light .ant-menu-item-selected {
+  // color: @primary-color !important; 
+}
+
+.ant-menu-light .ant-menu-item-selected {
+  background-color: rgba(21, 42, 140, 0.10) !important;
+  // color: @primary-color !important; 
+  font-weight: bold;
+
+}
+
+.ant-menu-light:not(.ant-menu-horizontal) .ant-menu-item:not(.ant-menu-item-selected):hover{
+  background-color: rgba(21, 42, 140, 0.06);
+}
+
+
