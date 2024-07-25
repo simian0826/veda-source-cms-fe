@@ -5,7 +5,7 @@
     <div class="p-4 bg-white flex">
       <Form
         name="basic"
-        class="w-full p-12"
+        class="w-full p-4"
         :rules="rules"
         :disabled="mode === 'view'"
         :label-col="{ style: { width: '150px' } }"

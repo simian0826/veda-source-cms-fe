@@ -59,7 +59,50 @@ export const ProductRoute: AppRouteRecordRaw = {
     },
   ],
 };
-
+export const UserRoute: AppRouteModule = {
+  path: "/user",
+  name: "User",
+  redirect: "/hero/list",
+  component: LAYOUT,
+  meta: {
+    title: "user",
+  },
+  children: [
+    {
+      path: "list",
+      name: "UserList",
+      meta: {
+        title: "user list",
+      },
+      component: () => import("/@/views/user/list.vue"),
+    },
+  ],
+};
+export const HeroSectionRoute: AppRouteRecordRaw = {
+  path: "/hero",
+  name: "Hero",
+  component: LAYOUT,
+  redirect: "/hero/update",
+  meta: { title: "hero" },
+  children: [
+    {
+      path: "update",
+      name: "HeroUpdate",
+      meta: {
+        title: "Hero Update",
+      },
+      component: () => import("/@/views/hero/index.vue"),
+    },
+    {
+      path: "detail",
+      name: "HeroDetail",
+      meta: {
+        title: "Hero Detai",
+      },
+      component: () => import("/@/views/hero/index.vue"),
+    },
+  ],
+};
 export const SSOLoginRoute: AppRouteRecordRaw = {
   path: "/ssoLogin",
   name: "SsoLogin",
@@ -77,4 +120,6 @@ export const basicRoutes = [
   REDIRECT_ROUTE,
   PAGE_NOT_FOUND_ROUTE,
   ProductRoute,
+  HeroSectionRoute,
+  UserRoute,
 ];
