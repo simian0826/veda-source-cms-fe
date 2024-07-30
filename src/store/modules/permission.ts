@@ -173,7 +173,6 @@ export const usePermissionStore = defineStore({
         }
         return;
       };
-
       switch (permissionMode) {
         case PermissionModeEnum.ROLE:
           routes = filter(asyncRoutes, routeFilter);
@@ -191,7 +190,6 @@ export const usePermissionStore = defineStore({
           menuList.sort((a, b) => {
             return (a.meta?.orderNo || 0) - (b.meta?.orderNo || 0);
           });
-
           this.setFrontMenuList(menuList);
           // Convert multi-level routing to level 2 routing
           routes = flatMultiLevelRoutes(routes);
@@ -213,41 +211,6 @@ export const usePermissionStore = defineStore({
           try {
             this.changePermissionCode();
             routeList = (await getMenuList()) as AppRouteRecordRaw[];
-            // routeList.push({
-            //   path: "/externals",
-            //   name: "externals",
-            //   component: "LAYOUT",
-            //   redirect: "/externals/cms",
-            //   meta: {
-            //     orderNo: 10000,
-            //     antIcon: "HomeFilled",
-            //     // icon: "scale|svg",
-            //     title: "外部跳转",
-            //     // hideChildrenInMenu: true,
-            //   },
-            //   children: [
-            //     {
-            //       path: "cms",
-            //       name: "cms",
-            //       meta: {
-            //         title: "内容中心",
-            //         system: "cms",
-            //         // hideMenu: true,
-            //       },
-            //       component: "/sys/externalSSO/index",
-            //     },
-            //     {
-            //       path: "voc",
-            //       name: "voc",
-            //       meta: {
-            //         system: "voc",
-
-            //         title: "问卷调查",
-            //       },
-            //       component: "/sys/externalSSO/index",
-            //     },
-            //   ],
-            // });
             this.setRouteList(routeList);
           } catch (error) {
             console.error(error);

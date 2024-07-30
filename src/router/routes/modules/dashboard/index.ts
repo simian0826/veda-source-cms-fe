@@ -9,10 +9,9 @@ const dashboard: AppRouteModule[] = [
     component: LAYOUT,
     redirect: "/dashboard/index",
     meta: {
-      orderNo: 10000,
-      antIcon: "HomeFilled",
+      antIcon: "HomeOutlined",
       title: "Home",
-      // hideChildrenInMenu: true,
+      hideChildrenInMenu: true,
     },
     children: [
       {
@@ -20,7 +19,6 @@ const dashboard: AppRouteModule[] = [
         name: "index",
         meta: {
           title: "仪表盘",
-          hideMenu: true,
         },
         component: () => import("/@/views/dashboard/index.vue"),
       },
