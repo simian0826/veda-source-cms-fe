@@ -2,30 +2,28 @@ import type { AppRouteModule } from "/@/router/types";
 
 import { LAYOUT } from "/@/router/constant";
 // import { HomeFilled } from "@ant-design/icons-vue";
-const dashboard: AppRouteModule[] = [
+const product: AppRouteModule[] = [
   {
-    path: "/dashboard",
+    path: "/product",
     name: "dashboard",
     component: LAYOUT,
-    redirect: "/dashboard/index",
+    redirect: "/product/list",
     meta: {
       orderNo: 10000,
       antIcon: "HomeFilled",
-      title: "Home",
-      // hideChildrenInMenu: true,
+      title: "Product",
     },
     children: [
       {
-        path: "index",
-        name: "index",
+        path: "list",
+        name: "Product List",
         meta: {
-          title: "仪表盘",
-          hideMenu: true,
+          title: "Products",
         },
-        component: () => import("/@/views/dashboard/index.vue"),
+        component: () => import("/@/views/product/List.vue"),
       },
     ],
   },
 ];
 
-export default dashboard;
+export default product;
