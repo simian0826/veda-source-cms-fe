@@ -65,7 +65,7 @@
               type: 'array',
               required: true,
               message: 'please set at least one property',
-              trigger: 'change',
+              trigger: ['blur'],
             },
           ]"
         >
@@ -232,7 +232,7 @@ const transferInfoToForm = (properties: any) => {
 };
 const formState = reactive<any>({
   name: "",
-  category: "",
+  category: undefined,
   description: "",
   properties: [],
   additionalProperties: [],
