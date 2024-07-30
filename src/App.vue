@@ -3,7 +3,6 @@
     :theme="{
       token: globalTheme,
     }"
-    :locale="zhCN"
   >
     <AppProvider>
       <RouterView />
@@ -17,7 +16,6 @@ import type { AliasToken } from "ant-design-vue/es/theme/internal";
 import { ConfigProvider } from "ant-design-vue";
 import { AppProvider } from "/@/components/Application";
 import { useTitle } from "/@/hooks/web/useTitle";
-import zhCN from "ant-design-vue/es/locale/zh_CN";
 import { ColorEnum } from "./enums/colorEnum";
 // const { token } = theme.useToken();
 // console.log(token.value);

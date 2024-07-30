@@ -70,7 +70,7 @@ export function checkStatus(
 
   if (errMessage) {
     if (errorMessageMode === "modal") {
-      createErrorModal({ title: "错误提示", content: errMessage });
+      createErrorModal({ title: "ERROR", content: errMessage });
     } else if (errorMessageMode === "message") {
       error({
         content: errMessage,

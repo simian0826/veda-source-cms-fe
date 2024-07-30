@@ -21,8 +21,8 @@ export function createPermissionGuard(router: Router) {
   const permissionStore = usePermissionStoreWithOut();
   router.beforeEach(async (to, from, next) => {
     // FIXME:
-    next();
-    return;
+    // next();
+    // return;
     // if (
     //   from.path === ROOT_PATH &&
     //   to.path === PageEnum.BASE_HOME

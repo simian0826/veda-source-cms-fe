@@ -65,7 +65,7 @@
               type: 'array',
               required: true,
               message: 'please set at least one property',
-              trigger: 'change',
+              trigger: 'blur',
             },
           ]"
         >
@@ -81,6 +81,7 @@
             :label="`property name ${index + 1}`"
             :rules="[
               {
+                type: 'array',
                 required: true,
                 message: 'property name can not be empty',
                 trigger: 'blur',
@@ -150,7 +151,7 @@ const route = useRoute();
 const mode = route.query.mode;
 console.log(route, "router");
 // file validator
-const imgValidator = async (_rule: Rule, value: string[]) => {
+const imgValidator = async (_rule: Rule, _value: string[]) => {
   if (imgList.value.length !== 3) {
     return Promise.reject("please upload three pictures");
   } else {
@@ -200,22 +201,7 @@ const rules: Record<string, Rule[]> = {
   //   },
   // ],
 };
-const properties = [
-  {
-    name: "title property 1",
-    items: [
-      { value: "value 1-1", label: "label 1-1" },
-      { value: "value 1-2", label: "label 1-2" },
-    ],
-  },
-  {
-    name: "title property 2",
-    items: [
-      { value: "value 2-1", label: "label 2-1" },
-      { value: "value 2-2", label: "label 2-2" },
-    ],
-  },
-];
+
 const transferInfoToForm = (properties: any) => {
   properties.forEach((pro) => {
     let _str: any = [];
@@ -241,10 +227,10 @@ const imgList = ref([]);
 const certificationList = ref([]);
 const categoryOptions = ref([]);
 const categoryPropertiesMap = ref({});
-onMountedOrActivated(() => {
-  transferInfoToForm(properties);
-  getOptions();
-  getAllCategoryPropertiesMap();
+onMountedOrActivated(async () => {
+  await getOptions();
+  await getAllCategoryPropertiesMap();
+  transferInfoToForm(categoryPropertiesMap.value);
 });
 
 // change properties by select category
