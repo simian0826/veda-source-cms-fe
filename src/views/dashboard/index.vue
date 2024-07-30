@@ -13,12 +13,10 @@
 import { Button, Input, Select } from "ant-design-vue";
 import { useRouter } from "vue-router";
 // import { useUserStore } from "/@/store/modules/user";
-import { useProhibitCopy } from "/@/hooks/event/useProhibitCopy";
 const options = [...Array(25)].map((_, i) => ({
   value: (i + 10).toString(36) + (i + 1),
 }));
 const router = useRouter();
-useProhibitCopy();
 const go = () => {
   router.push("/dashboard/index2");
 };

@@ -11,7 +11,7 @@
     <FormItem name="account" class="enter-x">
       <Input
         v-model:value="formData.account"
-        :placeholder="'账号'"
+        :placeholder="'account'"
         class="fix-auto-fill"
       >
         <template #prefix>
@@ -23,7 +23,7 @@
       <InputPassword
         visibilityToggle
         v-model:value="formData.password"
-        :placeholder="'密码'"
+        :placeholder="'password'"
       >
         <template #prefix>
           <LockOutlined />
@@ -58,7 +58,7 @@
         @click="handleLogin"
         :loading="loading"
       >
-        登录
+        LOGIN
       </Button>
       <!-- <Button size="large" class="mt-4 enter-x" block @click="handleRegister">
       </Button> -->
@@ -101,8 +101,8 @@ const loading = ref(false);
 // const rememberMe = ref(false);
 
 const formData = reactive({
-  account: "",
-  password: "",
+  account: "admin",
+  password: "123456",
 });
 
 const { validForm } = useFormValid(formRef);
@@ -116,24 +116,24 @@ async function handleLogin() {
   if (!data) return;
   try {
     loading.value = true;
-    const userInfo = await userStore.login(
+    const result = await userStore.login(
       toRaw({
         password: data.password,
         username: data.account,
         mode: "none", //不要默认的错误提示
       }),
     );
-    if (userInfo) {
+    if (result) {
       notification.success({
-        message: "登录成功",
-        description: `欢迎回来: ${userInfo.username}`,
+        message: "LOGIN was successfully",
+        description: `Welcome: ${userStore.getUserInfo.username}`,
         duration: 3,
       });
     }
   } catch (error: any) {
     createErrorModal({
-      title: "错误提示",
-      content: error.message || "网络异常，请检查您的网络连接是否正常!",
+      title: "ERROR",
+      content: error.message || "NETWORK ERROR!",
       getContainer: () =>
         document.body.querySelector(`.${prefixCls}`) || document.body,
     });

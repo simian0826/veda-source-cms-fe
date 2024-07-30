@@ -50,6 +50,8 @@ export default ({ mode }: ConfigEnv): UserConfigExport => {
       proxy: {
         "/veda-source": {
           target: "http://172.16.100.153:8080",
+          //target: "http://localhost:8080",
+
           changeOrigin: true,
           secure: true,
         },

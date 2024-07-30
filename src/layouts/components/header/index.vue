@@ -11,23 +11,23 @@
       <div class="user-dropdown-container">
         <Avatar src="https://xsgames.co/randomusers/avatar.php?g=pixel&key=1" />
         <span class="ml-2">
-          {{ userInfo.username }} - {{ roleInfo?.roleName }}
+          {{ userInfo.username }}
         </span>
       </div>
 
       <template #overlay>
         <AntMenu @click="clickMenuItem">
-          <AntMenu.Item :key="MenuKeyEnum.USER_INFO">
+          <!-- <AntMenu.Item :key="MenuKeyEnum.USER_INFO">
             <UserOutlined />
             <span class="ml-2">用户信息</span>
           </AntMenu.Item>
           <AntMenu.Item :key="MenuKeyEnum.ROLE_SWITCH">
             <UserSwitchOutlined />
             <span class="ml-2">切换角色</span>
-          </AntMenu.Item>
+          </AntMenu.Item> -->
           <AntMenu.Item :key="MenuKeyEnum.LOGOUT">
             <LogoutOutlined />
-            <span class="ml-2">退出登录</span>
+            <span class="ml-2">Logout</span>
           </AntMenu.Item>
         </AntMenu>
       </template>
@@ -38,8 +38,8 @@
 <script setup lang="ts">
 import {
   LogoutOutlined,
-  UserOutlined,
-  UserSwitchOutlined,
+  // UserOutlined,
+  // UserSwitchOutlined,
 } from "@ant-design/icons-vue";
 import { useUserStore } from "/@/store/modules/user";
 import { Layout, Avatar, Dropdown, Menu as AntMenu } from "ant-design-vue";

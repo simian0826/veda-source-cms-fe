@@ -18,12 +18,12 @@ import {
 } from "/@/api/sys/model/userModel";
 import {
   changeRoleApi,
-  doLogoutApi,
+  // doLogoutApi,
   getUserInfoApi,
   loginApi,
   ssoLoginApi,
   refreshTokenApi,
-  doSSOLogoutApi,
+  // doSSOLogoutApi,
   fetchExternalSSOUrlApi,
 } from "/@/api/sys/user";
 import { useMessage } from "/@/hooks/web/useMessage";
@@ -155,17 +155,19 @@ export const useUserStore = defineStore({
         goHome?: boolean;
         mode?: ErrorMessageMode;
       },
-    ): Promise<GetUserInfoModel | null> {
+    ): Promise<boolean | null> {
       try {
         const { goHome = true, mode, ...loginParams } = params;
         const data = await loginApi(loginParams, mode);
 
-        const { token } = data;
+        const { token, userId, username } = data;
 
         // save token
         this.setToken(token);
         this.setLoginType(LoginTypeEnum.ACCOUT_LOGIN);
         this.setCurrentRole(null);
+        this.setUserInfo({ userId: userId, username: username });
+
         return this.afterLoginAction({ goHome });
       } catch (error) {
         return Promise.reject(error);
@@ -180,7 +182,7 @@ export const useUserStore = defineStore({
         goHome?: boolean;
         mode?: ErrorMessageMode;
       },
-    ): Promise<GetUserInfoModel | null> {
+    ): Promise<boolean | null> {
       try {
         const { goHome = true, mode, ...ssoLoginParams } = params;
         const data = await ssoLoginApi(ssoLoginParams, mode);
@@ -282,14 +284,12 @@ export const useUserStore = defineStore({
       params: {
         goHome?: boolean;
       } = { goHome: false },
-    ): Promise<GetUserInfoModel | null> {
+    ): Promise<boolean | null> {
       const { goHome } = params;
       if (!this.getToken) return null;
       router.replace(PageEnum.BASE_HOME);
-      return null;
       // FIXME: no need for getting user info
-      const userInfo = await this.getUserInfoAction();
-
+      // const userInfo = await this.getUserInfoAction();
       const sessionTimeout = this.getSessionTimeout;
       if (sessionTimeout) {
         this.setSessionTimeout(false);
@@ -307,7 +307,7 @@ export const useUserStore = defineStore({
           await router.replace(PageEnum.BASE_HOME);
         }
       }
-      return userInfo;
+      return this.getToken ? true : false;
     },
     async getUserInfoAction(): Promise<GetUserInfoModel> {
       // let userInfo: GetUserInfoModel;
@@ -365,9 +365,9 @@ export const useUserStore = defineStore({
       if (this.token) {
         try {
           if (this.getLoginType === LoginTypeEnum.ACCOUT_LOGIN) {
-            await doLogoutApi();
+            // await doLogoutApi();
           } else {
-            await doSSOLogoutApi();
+            // await doSSOLogoutApi();
           }
         } catch {
           console.error("注销Token失败");
@@ -400,8 +400,8 @@ export const useUserStore = defineStore({
       const { createConfirm } = useMessage();
       createConfirm({
         iconType: "warning",
-        title: "温馨提醒",
-        content: "是否确认退出系统",
+        title: "WARNING",
+        content: "Comfirm that you want to log out",
         onOk: async () => {
           await this.logout(true);
         },

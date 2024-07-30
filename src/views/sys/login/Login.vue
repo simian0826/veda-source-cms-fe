@@ -11,7 +11,7 @@
         ></div> -->
     <Row justify="center" align="middle">
       <Col :span="7" class="text-center mt-20">
-        <img src="/@/assets/logo-toyota.svg" class="login-logo mb-10" />
+        <div class="logo-text mb-20">VEDA SOURCE CMS</div>
         <div class="relative p-4 login-form-container">
           <LoginForm />
         </div>
@@ -102,6 +102,12 @@ defineProps({
 
   .login-logo {
     width: 100%;
+  }
+  .logo-text {
+    font-size: 40px;
+    font-weight: bold;
+    width: 100%;
+    color: #111;
   }
   .login-form-container {
     border: 1px solid #eee;
