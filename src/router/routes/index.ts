@@ -1,5 +1,4 @@
 import type { AppRouteRecordRaw, AppRouteModule } from "/@/router/types";
-import { LAYOUT } from "/@/router/constant";
 
 import { PAGE_NOT_FOUND_ROUTE, REDIRECT_ROUTE } from "/@/router/routes/basic";
 
@@ -33,76 +32,6 @@ export const LoginRoute: AppRouteRecordRaw = {
   },
 };
 
-export const ProductRoute: AppRouteRecordRaw = {
-  path: "/product",
-  name: "product",
-  component: LAYOUT,
-  redirect: "/product/list",
-  meta: { title: "product list" },
-  children: [
-    {
-      path: "list",
-      name: "productList",
-      meta: {
-        title: "product list",
-        // hideMenu: true,
-      },
-      component: () => import("/@/views/product/index.vue"),
-    },
-    {
-      path: "detail",
-      name: "productDetail",
-      meta: {
-        title: "product detail",
-      },
-      component: () => import("/@/views/product/detail.vue"),
-    },
-  ],
-};
-export const UserRoute: AppRouteModule = {
-  path: "/user",
-  name: "User",
-  redirect: "/hero/list",
-  component: LAYOUT,
-  meta: {
-    title: "user",
-  },
-  children: [
-    {
-      path: "list",
-      name: "UserList",
-      meta: {
-        title: "user list",
-      },
-      component: () => import("/@/views/user/list.vue"),
-    },
-  ],
-};
-export const HeroSectionRoute: AppRouteRecordRaw = {
-  path: "/hero",
-  name: "Hero",
-  component: LAYOUT,
-  redirect: "/hero/update",
-  meta: { title: "hero" },
-  children: [
-    {
-      path: "update",
-      name: "HeroUpdate",
-      meta: {
-        title: "Hero Update",
-      },
-      component: () => import("/@/views/hero/index.vue"),
-    },
-    {
-      path: "detail",
-      name: "HeroDetail",
-      meta: {
-        title: "Hero Detai",
-      },
-      component: () => import("/@/views/hero/index.vue"),
-    },
-  ],
-};
 export const SSOLoginRoute: AppRouteRecordRaw = {
   path: "/ssoLogin",
   name: "SsoLogin",
@@ -119,7 +48,4 @@ export const basicRoutes = [
   RootRoute,
   REDIRECT_ROUTE,
   PAGE_NOT_FOUND_ROUTE,
-  ProductRoute,
-  HeroSectionRoute,
-  UserRoute,
 ];

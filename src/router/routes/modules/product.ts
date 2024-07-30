@@ -5,12 +5,11 @@ import { LAYOUT } from "/@/router/constant";
 const product: AppRouteModule[] = [
   {
     path: "/product",
-    name: "dashboard",
+    name: "Product",
     component: LAYOUT,
     redirect: "/product/list",
     meta: {
-      orderNo: 10000,
-      antIcon: "HomeFilled",
+      antIcon: "ProfileOutlined",
       title: "Product",
     },
     children: [
@@ -21,6 +20,15 @@ const product: AppRouteModule[] = [
           title: "Products",
         },
         component: () => import("/@/views/product/List.vue"),
+      },
+      {
+        path: "detail",
+        name: "Product List",
+        meta: {
+          title: "Product",
+          hideMenu: true,
+        },
+        component: () => import("/@/views/product/Detail.vue"),
       },
     ],
   },

@@ -43,7 +43,6 @@ import {
 } from "@ant-design/icons-vue";
 import { useUserStore } from "/@/store/modules/user";
 import { Layout, Avatar, Dropdown, Menu as AntMenu } from "ant-design-vue";
-import { computed } from "vue";
 import { router } from "/@/router";
 enum MenuKeyEnum {
   LOGOUT = "logout",
@@ -53,8 +52,6 @@ enum MenuKeyEnum {
 const { Header } = Layout;
 const userStore = useUserStore();
 const userInfo = userStore.fetchUserInfoAction();
-
-const roleInfo = computed(() => userStore.getCurrentRole);
 
 //  login out
 function handleLoginOut() {
