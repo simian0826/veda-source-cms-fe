@@ -6,6 +6,22 @@
 @import 'theme.less';
 @import 'entry.less';
 
+// 定义响应式混合
+.responseTo(@name) {
+  @breakpoints: {
+    xs: 767px;
+    sm: 768px;
+    md: 992px;
+    lg: 1200px;
+    xl: 1920px;
+  };
+  
+  // 获取媒体查询的断点值
+  @media (min-width: extract(@breakpoints, @name)) {
+    // 这里写媒体查询内的样式
+  }
+}
+
 input:-webkit-autofill {
   box-shadow: 0 0 0 1000px transparent inset;
   -webkit-text-fill-color: @text-color-base;
