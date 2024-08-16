@@ -17,15 +17,15 @@ const product: AppRouteModule[] = [
         path: "list",
         name: "Product List",
         meta: {
-          title: "Products",
+          title: "Product List",
         },
         component: () => import("/@/views/product/List.vue"),
       },
       {
         path: "detail",
-        name: "Product List",
+        name: "Product Detail",
         meta: {
-          title: "Product",
+          title: "Product Detail",
           hideMenu: true,
         },
         component: () => import("/@/views/product/Detail.vue"),

@@ -1,18 +1,32 @@
 <template>
   <div>
     <!-- title -->
-    <div class="font-size-[20px] mb-4">product list</div>
+    <div class="font-size-[20px] mb-4">Product List</div>
     <!-- filter -->
-    <header class="p-4 mb-4 bg-white flex justify-between">
+    <!-- <header class="p-4 mb-4 bg-white flex justify-between">
       <div>
         <span>category:</span>
-        <Select class="w-[200px] ml-4" />
+        <Select
+          :value="selectedCategory"
+          :options="categories"
+          class="w-[200px] ml-4"
+          @change="categoryChangeHandler"
+        />
       </div>
       <Button type="primary">Search</Button>
-    </header>
+    </header> -->
     <!-- main -->
     <div class="bg-white p-4">
-      <div class="mb-4 flex justify-end">
+      <div class="mb-4 flex justify-between">
+        <div>
+          <span>category:</span>
+          <Select
+            :value="selectedCategory"
+            :options="categories"
+            class="w-[200px] ml-4"
+            @change="categoryChangeHandler"
+          />
+        </div>
         <Button
           type="primary"
           @click="addNewProduct"
@@ -24,14 +38,25 @@
       <Table
         :columns="columns"
         row-key="id"
-        :data-source="list"
+        :data-source="productList"
         :pagination="false"
       >
         <template #bodyCell="{ column, record }">
-          <template v-if="column.key === 'action'">
+          <template v-if="column.key === 'images'">
+            <div class="flex flex-justify-start">
+              <img
+                class="w-[100px] mr-4"
+                v-for="item in record.imgs"
+                :src="item"
+                :key="item"
+              />
+            </div>
+          </template>
+
+          <template v-else-if="column.key === 'action'">
             <div>
-              <Button type="link" @click="jumpTo(record.id, 'view')">
-                view
+              <Button type="link" @click="jumpTo(record.id, 'detail')">
+                Detail
               </Button>
               <Button type="link" @click="jumpTo(record.id, 'edit')">
                 Edit
@@ -45,12 +70,12 @@
       </Table>
       <div class="flex justify-end">
         <Pagination
-          :total="pagination.total"
-          :show-total="(tableTotal) => `total ${tableTotal} items`"
+          :total="pagenigation.total"
+          :show-total="() => `total ${pagenigation.total} items`"
           show-size-changer
           show-quick-jumper
-          :current="pagination.current"
-          :page-size="pagination.pageSize"
+          :current="pagenigation.page"
+          :page-size="pagenigation.pageSize"
           @change="handlePageChange"
         />
       </div>
@@ -60,37 +85,47 @@
 
 <script lang="ts" setup>
 import { Button, Select, Table, Pagination } from "ant-design-vue";
-import { ref, h } from "vue";
+import { ref, h, onBeforeMount } from "vue";
 import { PlusCircleOutlined } from "@ant-design/icons-vue";
 import { useRouter } from "vue-router";
+import { getProductListApi, getCategoryDictApi } from "/@/api/product";
+import type { Dict, Pagenigation } from "/@/api/model/baseModel";
 
 const router = useRouter();
+const listLoading = ref(false);
+const categories = ref<Dict[]>([]);
+const selectedCategory = ref();
+const pagenigation = ref<Pagenigation>({
+  page: 1,
+  pageSize: 10,
+  total: 0,
+});
 const columns = [
   {
-    title: "name",
+    title: "Name",
     dataIndex: "name",
     key: "name",
+    width: 250,
   },
   {
-    title: "category",
+    title: "Category",
     dataIndex: "category",
+    width: 250,
+  },
+
+  {
+    title: "Product Images",
+    key: "images",
+    dataIndex: "imgs",
   },
   {
-    title: "action",
+    title: "Action",
     key: "action",
     width: 250,
   },
 ];
-const pagination = ref({
-  current: 1,
-  pageSize: 10,
-  total: 0,
-});
-const list = ref([
-  {
-    id: "xxx",
-  },
-]);
+
+const productList = ref();
 // to detail
 const jumpTo = (id, type) => {
   router.push({
@@ -116,9 +151,57 @@ const confirmDelete = (id) => {
 };
 // pager change
 const handlePageChange = (page, size) => {
-  pagination.value.current = page;
-  pagination.value.pageSize = size;
+  pagenigation.value.page = page;
+  pagenigation.value.pageSize = size;
+
+  fetchProductList();
 };
+
+const fetchProductList = async (isInit = false) => {
+  if (isInit) {
+    pagenigation.value.page = 1;
+    productList.value = [];
+    pagenigation.value.total = 0;
+    pagenigation.value.pageSize = 10;
+  }
+
+  try {
+    listLoading.value = true;
+    const res = await getProductListApi({
+      category: selectedCategory.value,
+      page: pagenigation.value.page,
+      pageSize: pagenigation.value.pageSize,
+    });
+
+    if (res.list.length > 0) {
+      productList.value.push(...res.list);
+    }
+    pagenigation.value.total = res.total;
+    pagenigation.value.page++;
+  } finally {
+    listLoading.value = false;
+  }
+};
+
+const fetchCategoryDict = async () => {
+  const res = await getCategoryDictApi();
+  console.log(res);
+
+  categories.value = res;
+};
+
+const categoryChangeHandler = (categoryItem: Dict) => {
+  selectedCategory.value = categoryItem;
+  fetchProductList(true);
+};
+
+onBeforeMount(async () => {
+  await fetchCategoryDict();
+  if (categories.value.length > 0) {
+    selectedCategory.value = categories.value[0].value;
+    fetchProductList(true);
+  }
+});
 </script>
 
 <style lang="less" scoped></style>

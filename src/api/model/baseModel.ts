@@ -3,6 +3,17 @@ export interface BasicPageParams {
   pageSize: number;
 }
 
+export type Pagenigation = BasicPageParams & {
+  total: number;
+};
+
+export type ListRequest<T> = T & BasicPageParams;
+
+export type ListResult<T> = {
+  list: T[];
+  total: number;
+};
+
 export interface BasicRequestPageParams {
   pageNum: number;
   pageSize: number;
@@ -35,7 +46,9 @@ export interface FormListModel {
   onChange?: (value: string) => void;
 }
 
-export interface SelectOptionsModel {
+export type SelectOptionsModel = Dict;
+
+export type Dict = {
   label: string;
   value: string;
-}
+};

@@ -11,13 +11,17 @@ import axios from "axios";
 import qs from "qs";
 import { AxiosCanceler } from "./axiosCancel";
 import { isFunction } from "/@/utils/is";
-import { cloneDeep, omit } from "lodash-es";
+import { cloneDeep } from "lodash-es";
 import { ContentTypeEnum } from "/@/enums/httpEnum";
 import { RequestEnum } from "/@/enums/httpEnum";
 import { Gen2Result } from "../../types";
 import { message } from "ant-design-vue";
+import { useGlobSetting } from "/@/hooks/setting";
 
 export * from "./axiosTransform";
+const globSetting = useGlobSetting();
+
+const urlPrefix = globSetting.urlPrefix;
 
 /**
  * @description:  axios module
@@ -136,38 +140,67 @@ export class VAxios {
   /**
    * @description:  File Upload
    */
-  uploadFile<T = any>(config: AxiosRequestConfig, params: UploadFileParams) {
-    const formData = new window.FormData();
+  uploadFile<T = any>(config: AxiosRequestConfig, params: FormData) {
+    // const formData = new window.FormData();
 
-    if (params.data) {
-      Object.keys(params.data).forEach((key) => {
-        if (!params.data) return;
-        const value = params.data[key];
-        if (Array.isArray(value)) {
-          value.forEach((item) => {
-            formData.append(`${key}[]`, item);
-          });
-          return;
-        }
+    // if (params.data) {
+    //   Object.keys(params.data).forEach((key) => {
+    //     if (!params.data) return;
+    //     const value = params.data[key];
+    //     if (Array.isArray(value)) {
+    //       value.forEach((item) => {
+    //         formData.append(`${key}[]`, item);
+    //       });
+    //       return;
+    //     }
 
-        formData.append(key, params.data[key]);
-      });
-    }
-    formData.append(params.name || "file", params.file, params.filename);
-    const customParams = omit(params, "file", "filename", "file");
+    //     formData.append(key, params.data[key]);
+    //   });
+    // }
+    // formData.append(params.name || "file", params.file, params.filename);
+    // const customParams = omit(params, "file", "filename", "file");
 
-    Object.keys(customParams).forEach((key) => {
-      formData.append(key, customParams[key]);
-    });
+    // Object.keys(customParams).forEach((key) => {
+    //   formData.append(key, customParams[key]);
+    // });
 
-    return this.axiosInstance.request<T>({
-      ...config,
-      method: "POST",
-      data: formData,
-      headers: {
-        "Content-type": ContentTypeEnum.FORM_DATA,
-        ignoreCancelToken: true,
-      },
+    const transform = this.getTransform();
+    const { requestCatchHook, transformRequestHook } = transform || {};
+    config.url = `${urlPrefix}${config.url}`;
+
+    return new Promise((resolve, reject) => {
+      this.axiosInstance
+        .request<any, AxiosResponse<Gen2Result>>({
+          ...config,
+          method: "POST",
+          data: params,
+          headers: {
+            "Content-type": ContentTypeEnum.FORM_DATA,
+            ignoreCancelToken: true,
+          },
+        })
+        .then((res: AxiosResponse<Gen2Result>) => {
+          if (transformRequestHook && isFunction(transformRequestHook)) {
+            try {
+              const ret = transformRequestHook(res, {});
+              resolve(ret);
+            } catch (err) {
+              reject(err || new Error("request error!"));
+            }
+            return;
+          }
+          resolve(res as unknown as Promise<T>);
+        })
+        .catch((e: Error | AxiosError) => {
+          if (requestCatchHook && isFunction(requestCatchHook)) {
+            reject(requestCatchHook(e, {}));
+            return;
+          }
+          if (axios.isAxiosError(e)) {
+            // rewrite error message from axios in here
+          }
+          reject(e);
+        });
     });
   }
 

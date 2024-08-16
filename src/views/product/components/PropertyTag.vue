@@ -1,13 +1,13 @@
 <template>
   <div class="flex">
     <template v-for="tag in state.tags" :key="tag">
-      <Tooltip v-if="tag.length > 20" :title="tag">
+      <Tooltip v-if="tag.label.length > 20" :title="tag.label">
         <Tag
           :closable="!disabled && state.tags.length !== 1"
           class="py-1 px-4"
           @close="handleClose(tag)"
         >
-          {{ `${tag.slice(0, 20)}...` }}
+          {{ `${tag.label.slice(0, 20)}...` }}
         </Tag>
       </Tooltip>
       <Tag
@@ -16,7 +16,7 @@
         :closable="!disabled && state.tags.length !== 1"
         @close="handleClose(tag)"
       >
-        {{ tag }}
+        {{ tag.label }}
       </Tag>
     </template>
     <div v-if="!disabled">
@@ -46,10 +46,11 @@
 import { ref, reactive, nextTick, PropType, watch } from "vue";
 import { PlusOutlined } from "@ant-design/icons-vue";
 import { Tag, Tooltip, Input } from "ant-design-vue";
+import type { Dict } from "/@/api/model/baseModel";
 const inputRef = ref();
 const props = defineProps({
   items: {
-    type: Array as PropType<String[]>,
+    type: Array as PropType<Dict[]>,
     default: () => [],
   },
   disabled: {
@@ -71,7 +72,6 @@ const state = reactive<any>({
 const emits = defineEmits(["update:items"]);
 const handleClose = (removedTag: string) => {
   const tags = state.tags.filter((tag) => tag !== removedTag);
-  console.log(tags);
   //   state.tags = tags;
   emits("update:items", tags);
 };
@@ -87,9 +87,8 @@ const handleInputConfirm = () => {
   const inputValue = state.inputValue;
   let tags = state.tags;
   if (inputValue && tags.indexOf(inputValue) === -1) {
-    tags = [...tags, inputValue];
+    tags = [...tags, { label: inputValue, value: inputValue }];
   }
-  console.log(tags);
   emits("update:items", tags);
   Object.assign(state, {
     // tags,

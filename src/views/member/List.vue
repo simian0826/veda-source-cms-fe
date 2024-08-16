@@ -2,7 +2,7 @@
   <div>
     <div class="font-size-[20px] mb-4">
       <div>Member List</div>
-      <Button @click="openMemberModal">New</Button>
+      <Button @click="openMemberModal()">New</Button>
     </div>
 
     <div class="p-4 w-full bg-white member-container">
@@ -16,7 +16,7 @@
           <img class="member-image" alt="example" :src="item.image" />
         </template>
         <template #actions>
-          <EditOutlined key="edit" />
+          <EditOutlined key="edit" @click="openMemberModal(item)" />
           <DeleteOutlined key="delete" />
         </template>
         <Meta>
@@ -71,15 +71,16 @@
             ]"
           >
             <Upload
-              v-model:file-list="memberForm.image"
-              action="/veda-source/storage/upload"
+              action="/veda-source/storage/uploadFileByAntd"
+              :headers="uploadHeader"
+              list-type="picture"
+              :max-count="1"
+              v-model:file-list="memberImage"
               @change="handleFileChange"
             >
               <div v-if="!memberForm.image">
-                <div>
-                  <PlusOutlined />
-                  <div style="margin-top: 8px">Upload</div>
-                </div>
+                <PlusOutlined />
+                <div style="margin-top: 8px">Upload</div>
               </div>
             </Upload>
           </Form.Item>
@@ -98,12 +99,20 @@ import {
 } from "@ant-design/icons-vue";
 import { onMounted, ref } from "vue";
 import { Member } from "/@/api/member/model";
-import { BasicPageParams } from "/@/api/model";
+import { BasicPageParams } from "/@/api/model/baseModel";
+import { uploadImg } from "/@/api/product";
+import { useUserStore } from "/@/store/modules/user";
+
 import { getMemberListApi } from "/@/api/member/index";
 import type { UploadProps, UploadChangeParam } from "ant-design-vue";
 
+const userStore = useUserStore();
+const uploadHeader = {
+  Authorization: userStore.getToken,
+};
+
 const { Meta } = Card;
-const memberModal = ref(false);
+const memberModal = ref(true);
 const createLoading = ref(false);
 const modalTitle = ref("Create");
 const memberList = ref<Member[]>([]);
@@ -112,6 +121,7 @@ const memberForm = ref<Member>({
   description: "",
   image: "",
 });
+const memberImage = ref<UploadProps["fileList"]>([]);
 const pagenigation = ref<BasicPageParams>({ page: 0, pageSize: 8 });
 const openMemberModal = (member?: Member) => {
   memberModal.value = true;
@@ -127,6 +137,12 @@ const openMemberModal = (member?: Member) => {
 };
 const handleCreate = () => {};
 const handleCancel = () => {};
+
+const uploadHandler = async (params) => {
+  const res = await uploadImg(params.file);
+
+  console.log(res, "res");
+};
 onMounted(async () => {
   const res = await getMemberListApi(pagenigation.value);
   memberList.value = res.list;
@@ -138,6 +154,15 @@ const handleFileChange = (info: UploadChangeParam) => {
 </script>
 
 <style lang="less" scoped>
+.ant-upload-select-picture-card i {
+  font-size: 32px;
+  color: #999;
+}
+
+.ant-upload-select-picture-card .ant-upload-text {
+  margin-top: 8px;
+  color: #666;
+}
 .member-container {
   flex-wrap: wrap;
   display: grid;

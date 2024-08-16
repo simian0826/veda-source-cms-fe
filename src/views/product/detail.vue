@@ -7,7 +7,7 @@
         name="basic"
         class="w-full p-4"
         :rules="rules"
-        :disabled="mode === 'view'"
+        :disabled="mode === 'detail'"
         :label-col="{ style: { width: '150px' } }"
         :model="formState"
         @finish="handleFinish"
@@ -29,27 +29,38 @@
             placeholder="please enter"
           />
         </FormItem>
-        <FormItem label="product images" name="imgList">
+        <FormItem label="product images" name="imgs">
           <Upload
+            :headers="uploadHeader"
             v-model:file-list="imgList"
-            action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+            :beforeUpload="beforeUploadHandler"
+            action="/veda-source/storage/uploadFileByAntd"
             list-type="picture-card"
-            @change="handleFileChange"
+            @change="
+              (params) => {
+                handleFileChange(params, 'imgs');
+              }
+            "
           >
-            <div v-if="imgList.length < 3">
+            <div v-if="imgList && imgList.length < 3">
               <plus-outlined />
               <div style="margin-top: 8px">Upload</div>
             </div>
           </Upload>
         </FormItem>
-        <FormItem label="product certifacate" name="certificationList">
+        <FormItem label="product certifacate" name="certificate">
           <Upload
+            :headers="uploadHeader"
             v-model:file-list="certificationList"
-            action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+            action="/veda-source/storage/uploadFileByAntd"
             list-type="picture-card"
-            @change="handleFileChange"
+            @change="
+              (params) => {
+                handleFileChange(params, 'certificate');
+              }
+            "
           >
-            <div v-if="certificationList.length < 3">
+            <div v-if="certificationList && certificationList.length < 3">
               <plus-outlined />
               <div style="margin-top: 8px">Upload</div>
             </div>
@@ -57,19 +68,23 @@
         </FormItem>
         <FormItem
           v-for="(item, index) in formState.properties"
-          :key="item.label"
-          :name="['properties', index, 'items']"
-          :label="item.label"
+          :key="item.name"
+          :name="['properties', index]"
+          :label="item.name"
           :rules="[
             {
               type: 'array',
               required: true,
               message: 'please set at least one property',
               trigger: 'blur',
+              validator: propertyValidator,
             },
           ]"
         >
-          <PropertyTag v-model:items="item.items" :disabled="mode === 'view'" />
+          <PropertyTag
+            v-model:items="item.items"
+            :disabled="mode === 'detail'"
+          />
         </FormItem>
         <Card
           v-for="(item, index) in formState.additionalProperties"
@@ -77,18 +92,19 @@
           class="mb-4 px-0 py-4 pb-0"
         >
           <FormItem
-            :name="['additionalProperties', index, 'label']"
-            :label="`property name ${index + 1}`"
+            :name="['additionalProperties', index, 'name']"
+            label="property name"
             :rules="[
               {
                 type: 'array',
                 required: true,
                 message: 'property name can not be empty',
-                trigger: 'blur',
+                trigger: 'change',
+                validator: addtionalPropertyNameValidator,
               },
             ]"
           >
-            <Input v-model:value="item.label" class="w-[200px]" />
+            <Input v-model:value="item.name" class="w-[200px]" />
             <Button
               :icon="h(MinusCircleOutlined)"
               class="h-[36px] ml-4"
@@ -98,19 +114,20 @@
             </Button>
           </FormItem>
           <FormItem
-            :label="`property values ${index + 1}`"
+            label="property values"
             :name="['additionalProperties', index, 'items']"
             :rules="[
               {
                 required: true,
-                message: 'property values can not be empty',
-                trigger: 'change',
+                message: 'property item can not be empty',
+                trigger: 'blur',
+                validator: addtionalPropertyItemValidator,
               },
             ]"
           >
             <PropertyTag
               v-model:items="item.items"
-              :disabled="mode === 'view'"
+              :disabled="mode === 'detail'"
             />
           </FormItem>
         </Card>
@@ -134,9 +151,13 @@ import { onMountedOrActivated } from "/@/hooks/core/onMountedOrActivated";
 import PropertyTag from "./components/PropertyTag.vue";
 import type { Rule } from "ant-design-vue/es/form";
 import {
-  getCategoryDict,
-  getAllCategoryProperties,
-} from "/@/api/product/product";
+  getCategoryDictApi,
+  getAllCategoryPropertiesApi,
+  createProductApi,
+} from "/@/api/product";
+import type { Dict } from "/@/api/model/baseModel";
+import type { ProductDTO, ProductProperty } from "/@/api/product/model";
+import type { UploadChangeParam, UploadProps } from "ant-design-vue";
 import {
   Form,
   Card,
@@ -146,25 +167,52 @@ import {
   Upload,
   Textarea,
   Button,
+  message,
 } from "ant-design-vue";
+import { useUserStore } from "/@/store/modules/user";
+
+const userStore = useUserStore();
+const uploadHeader = {
+  Authorization: userStore.getToken,
+};
 const route = useRoute();
 const mode = route.query.mode;
-console.log(route, "router");
 // file validator
-const imgValidator = async (_rule: Rule, _value: string[]) => {
-  if (imgList.value.length !== 3) {
-    return Promise.reject("please upload three pictures");
+
+const imgsValidator = async (_rule, value) => {
+  if (value.length != 3) {
+    return Promise.reject("Product images must be 3");
+  }
+  return Promise.resolve();
+};
+const certificateValidator = async (_rule, value) => {
+  if (value.length > 3) {
+    return Promise.reject("Certification should be less than 3");
+  }
+  return Promise.resolve();
+};
+
+const propertyValidator = async (_rule, value) => {
+  if (value.items.length === 0) {
+    return Promise.reject("Please set at least one property");
+  }
+  return Promise.resolve();
+};
+const addtionalPropertyNameValidator = async (_rule, value) => {
+  console.log(value);
+  console.log(formState);
+
+  if (!value) {
+    return Promise.reject("Please input the property name");
   } else {
     return Promise.resolve();
   }
 };
-// certification validator
-const certificationValidator = async (_rule: Rule, value: string[]) => {
-  if (certificationList.value.length !== 3) {
-    return Promise.reject("please upload three pictures");
-  } else {
-    return Promise.resolve();
+const addtionalPropertyItemValidator = async (_rule, value) => {
+  if (value.length === 0) {
+    return Promise.reject("Please set at least one property");
   }
+  return Promise.resolve();
 };
 const rules: Record<string, Rule[]> = {
   name: [
@@ -188,44 +236,79 @@ const rules: Record<string, Rule[]> = {
       trigger: "change",
     },
   ],
-  // imgList: [
-  //   {
-  //     required: true,
-  //     validator: imgValidator,
-  //   },
-  // ],
-  // certificationList: [
-  //   {
-  //     required: true,
-  //     validator: certificationValidator,
-  //   },
-  // ],
+  properties: [
+    {
+      type: "array",
+      required: true,
+      message: "property name can not be empty",
+      trigger: "change",
+    },
+  ],
+  additionalProperties: [
+    {
+      type: "array",
+      required: true,
+      message: "property name can not be empty",
+      trigger: "change",
+    },
+  ],
+  imgs: [
+    {
+      type: "array",
+      required: true,
+      trigger: "change",
+      validator: imgsValidator,
+    },
+  ],
+  certificate: [
+    {
+      type: "array",
+
+      required: true,
+      message: "Product certification can not be empty",
+      trigger: "change",
+      validator: certificateValidator,
+    },
+  ],
 };
 
 const transferInfoToForm = (properties: any) => {
-  properties.forEach((pro) => {
-    let _str: any = [];
-    pro.items.length &&
-      pro.items.forEach((subPro) => {
-        _str.push(subPro.value);
+  properties.length > 0 &&
+    properties.forEach((pro) => {
+      let _str: any = [];
+      pro.items.length &&
+        pro.items.forEach((subPro) => {
+          _str.push(subPro.value);
+        });
+      formState.properties.push({
+        name: pro.name,
+        items: _str,
       });
-    formState.properties.push({
-      label: pro.name,
-      items: _str,
     });
-  });
   console.log(formState, "formState");
 };
-const formState = reactive<any>({
+const formState = reactive<ProductDTO>({
   name: "",
-  category: undefined,
+  category: "",
   description: "",
+  imgs: [],
+  certificate: [],
   properties: [],
   additionalProperties: [],
 });
-const imgList = ref([]);
-const certificationList = ref([]);
-const categoryOptions = ref([]);
+const imgList = ref<UploadProps["fileList"]>([]);
+const certificationList = ref<UploadProps["fileList"]>([
+  // {
+  //   uid: "-1",
+  //   name: "xxx.png",
+  //   status: "done",
+  //   url: "https://uploads-ssl.webflow.com/64d54eb7f99a540e86caeea1/64d54eb7f99a540e86caeeaa_patrick-hendry-eDgUyGu93Yw-unsplash.jpg",
+  //   thumbUrl:
+  //     "https://uploads-ssl.webflow.com/64d54eb7f99a540e86caeea1/64d54eb7f99a540e86caeeaa_patrick-hendry-eDgUyGu93Yw-unsplash.jpg",
+  // },
+]);
+
+const categoryOptions = ref<Dict[]>([]);
 const categoryPropertiesMap = ref({});
 onMountedOrActivated(async () => {
   await getOptions();
@@ -241,7 +324,7 @@ const handleChangeCategory = (val) => {
   const _arr: any = [];
   _proArr.forEach((pro: string) => {
     _arr.push({
-      label: pro,
+      name: pro,
       items: [],
     });
   });
@@ -250,13 +333,13 @@ const handleChangeCategory = (val) => {
 };
 // get all category properties
 const getAllCategoryPropertiesMap = async () => {
-  const res = await getAllCategoryProperties();
+  const res = await getAllCategoryPropertiesApi();
   console.log(res, "properties res");
   categoryPropertiesMap.value = res;
 };
 // get dict options
 const getOptions = async () => {
-  const res = await getCategoryDict();
+  const res = await getCategoryDictApi();
   console.log("category dict res", res);
   categoryOptions.value = res || [];
 };
@@ -274,7 +357,7 @@ const computedTitle = computed(() => {
   switch (mode) {
     case "add":
       return "new product";
-    case "view":
+    case "detail":
       return "product detail";
     case "edit":
       return "update product";
@@ -284,7 +367,7 @@ const computedTitle = computed(() => {
 });
 const handleAddProperty = () => {
   formState.additionalProperties.push({
-    label: "",
+    name: "",
     items: [],
   });
 };
@@ -292,16 +375,80 @@ const handleAddProperty = () => {
 const handleDeleteProperty = (index) => {
   formState.additionalProperties.splice(index, 1);
 };
+
+const beforeUploadHandler = () => {
+  console.log("beforeUploadHandler");
+};
 // file change
-const handleFileChange = (file) => {
-  const formData = new FormData();
-  formData.append("file", file);
-  console.log(formData, "formData");
+const handleFileChange = (
+  params: UploadChangeParam,
+  type: "imgs" | "certificate",
+) => {
+  console.log(params);
+  const { file, fileList } = params;
+  if (file.status === "done" || file.status === "removed") {
+    formState[type] = [];
+
+    if (fileList.length > 0) {
+      fileList.forEach((item) => {
+        let fileUrl = "";
+        if (item.url) {
+          fileUrl = item.url;
+        } else {
+          fileUrl = item.response.data[0].url;
+        }
+        formState[type].push(fileUrl);
+      });
+    }
+  }
+  // const formData = new FormData();
+  // formData.append("file", file);
+  // console.log(formData, "formData");
 };
 // submit
-const handleFinish = () => {
+const handleFinish = async () => {
   console.log(formState, "success");
+
+  // const requestParams: ProductDTO = {
+  //   ...formState,
+  //   additionalProperties: formState.additionalProperties.map((property) => {
+  //     return {
+  //       name: property.name,
+  //       items: property.items.map((item) => {
+  //         return {
+  //           label: item,
+  //           value: item,
+  //         };
+  //       }),
+  //     };
+  //   }) as unknown as ProductProperty[],
+  //   properties: formState.properties.map((property) => {
+  //     return {
+  //       name: property.name,
+  //       items: property.items.map((item) => {
+  //         return {
+  //           label: item,
+  //           value: item,
+  //         };
+  //       }),
+  //     };
+  //   }) as unknown as ProductProperty[],
+  // };
+  let res;
+  if (mode === "add") {
+    res = await createProductApi(formState);
+  }
+  if (mode === "edit") {
+  }
+  if (res) {
+    message.success(mode + " product successfully");
+  } else {
+    message.error(mode + "product successfully");
+  }
+
+  console.log(res, "res");
 };
 </script>
 
 <style lang="less" scoped></style>
+../../api/product

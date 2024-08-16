@@ -83,6 +83,6 @@ export type MergeAll<T extends object[], R extends object = {}> = T extends [
   : R;
 
 export interface Gen2Result extends Omit<Result, "message" | "result"> {
-  msg?: string;
+  message?: string;
   data?: any;
 }

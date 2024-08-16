@@ -169,6 +169,7 @@ export const useUserStore = defineStore({
         this.setUserInfo({ userId: userId, username: username });
 
         return this.afterLoginAction({ goHome });
+        
       } catch (error) {
         return Promise.reject(error);
       }
