@@ -1,7 +1,7 @@
 import { defHttp } from "/@/utils/http/axios";
 import { ContentTypeEnum } from "/@/enums/httpEnum";
 import { Dict, ListRequest, ListResult } from "../model/baseModel";
-import { Product, ProductDTO } from "./model";
+import { ProductDTO, Product } from "./model";
 
 enum Api {
   // upload
@@ -11,7 +11,7 @@ enum Api {
   GetAllCategoryProperties = "/productCategoryPropertyConfig/list", // get category properties by category
   UpdateProduct = "/product/update",
   DeleteProduct = "/product/delete",
-  ViewProduct = "/product/detail",
+  ProductDetail = "/product/detail-cms",
   GetProductList = "/product/list",
   CreateProduct = "/product/create",
   // hero
@@ -32,10 +32,14 @@ export const getAllCategoryPropertiesApi = () => {
   });
 };
 
-export const getProductListApia = (
+export const getProductListApi = (
   params: ListRequest<{ category: string }>,
 ) => {
   return defHttp.get<ListResult<Product>>({ url: Api.GetProductList, params });
+};
+
+export const getProductApi = (id: number) => {
+  return defHttp.get<ProductDTO>({ url: `${Api.ProductDetail}/${id}` });
 };
 
 export const createProductApi = (params: ProductDTO) => {

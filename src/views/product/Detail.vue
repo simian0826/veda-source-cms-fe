@@ -135,7 +135,10 @@
           <Button @click="handleAddProperty">add new porperty</Button>
         </FormItem>
         <FormItem :wrapper-col="{ offset: 8, span: 16 }">
-          <Button type="primary" html-type="submit">Submit</Button>
+          <Button v-if="mode !== 'detail'" type="primary" html-type="submit">
+            Submit
+          </Button>
+          <Button v-else type="primary">Edit</Button>
         </FormItem>
       </Form>
     </div>
@@ -146,7 +149,7 @@
 // TODO: 详情，新增，编辑页面
 import { useRoute } from "vue-router";
 import { PlusOutlined, MinusCircleOutlined } from "@ant-design/icons-vue";
-import { computed, ref, reactive, h } from "vue";
+import { computed, ref, h, onBeforeMount } from "vue";
 import { onMountedOrActivated } from "/@/hooks/core/onMountedOrActivated";
 import PropertyTag from "./components/PropertyTag.vue";
 import type { Rule } from "ant-design-vue/es/form";
@@ -154,9 +157,10 @@ import {
   getCategoryDictApi,
   getAllCategoryPropertiesApi,
   createProductApi,
+  getProductApi,
 } from "/@/api/product";
 import type { Dict } from "/@/api/model/baseModel";
-import type { ProductDTO, ProductProperty } from "/@/api/product/model";
+import type { ProductDTO } from "/@/api/product/model";
 import type { UploadChangeParam, UploadProps } from "ant-design-vue";
 import {
   Form,
@@ -177,7 +181,40 @@ const uploadHeader = {
 };
 const route = useRoute();
 const mode = route.query.mode;
-// file validator
+
+const formState = ref<ProductDTO>({
+  name: "",
+  category: "",
+  description: "",
+  imgs: [],
+  certificate: [],
+  properties: [],
+  additionalProperties: [],
+});
+const imgList = ref<UploadProps["fileList"]>([]);
+const certificationList = ref<UploadProps["fileList"]>();
+const initFormHandler = async () => {
+  const { id } = route.query;
+
+  const res = await getProductApi(Number(id));
+  formState.value = res;
+
+  imgList.value = formState.value.imgs.map((item, index) => ({
+    uid: String(index),
+    name: item.substring(item.lastIndexOf("/") + 1),
+    status: "done",
+    url: item,
+    thumbUrl: item,
+  }));
+
+  certificationList.value = formState.value.certificate.map((item, index) => ({
+    uid: String(index),
+    name: item.substring(item.lastIndexOf("/") + 1),
+    status: "done",
+    url: item,
+    thumbUrl: item,
+  }));
+};
 
 const imgsValidator = async (_rule, value) => {
   if (value.length != 3) {
@@ -200,7 +237,6 @@ const propertyValidator = async (_rule, value) => {
 };
 const addtionalPropertyNameValidator = async (_rule, value) => {
   console.log(value);
-  console.log(formState);
 
   if (!value) {
     return Promise.reject("Please input the property name");
@@ -280,41 +316,16 @@ const transferInfoToForm = (properties: any) => {
         pro.items.forEach((subPro) => {
           _str.push(subPro.value);
         });
-      formState.properties.push({
+      formState.value.properties.push({
         name: pro.name,
         items: _str,
       });
     });
-  console.log(formState, "formState");
+  console.log(formState.value, "formState");
 };
-const formState = reactive<ProductDTO>({
-  name: "",
-  category: "",
-  description: "",
-  imgs: [],
-  certificate: [],
-  properties: [],
-  additionalProperties: [],
-});
-const imgList = ref<UploadProps["fileList"]>([]);
-const certificationList = ref<UploadProps["fileList"]>([
-  // {
-  //   uid: "-1",
-  //   name: "xxx.png",
-  //   status: "done",
-  //   url: "https://uploads-ssl.webflow.com/64d54eb7f99a540e86caeea1/64d54eb7f99a540e86caeeaa_patrick-hendry-eDgUyGu93Yw-unsplash.jpg",
-  //   thumbUrl:
-  //     "https://uploads-ssl.webflow.com/64d54eb7f99a540e86caeea1/64d54eb7f99a540e86caeeaa_patrick-hendry-eDgUyGu93Yw-unsplash.jpg",
-  // },
-]);
 
 const categoryOptions = ref<Dict[]>([]);
 const categoryPropertiesMap = ref({});
-onMountedOrActivated(async () => {
-  await getOptions();
-  await getAllCategoryPropertiesMap();
-  transferInfoToForm(categoryPropertiesMap.value);
-});
 
 // change properties by select category
 const handleChangeCategory = (val) => {
@@ -328,7 +339,7 @@ const handleChangeCategory = (val) => {
       items: [],
     });
   });
-  formState.properties = _arr;
+  formState.value.properties = _arr;
   console.log(_proArr, "xxx");
 };
 // get all category properties
@@ -366,14 +377,14 @@ const computedTitle = computed(() => {
   }
 });
 const handleAddProperty = () => {
-  formState.additionalProperties.push({
+  formState.value.additionalProperties.push({
     name: "",
     items: [],
   });
 };
 // delete additional property
 const handleDeleteProperty = (index) => {
-  formState.additionalProperties.splice(index, 1);
+  formState.value.additionalProperties.splice(index, 1);
 };
 
 const beforeUploadHandler = () => {
@@ -387,7 +398,7 @@ const handleFileChange = (
   console.log(params);
   const { file, fileList } = params;
   if (file.status === "done" || file.status === "removed") {
-    formState[type] = [];
+    formState.value[type] = [];
 
     if (fileList.length > 0) {
       fileList.forEach((item) => {
@@ -397,7 +408,7 @@ const handleFileChange = (
         } else {
           fileUrl = item.response.data[0].url;
         }
-        formState[type].push(fileUrl);
+        formState.value[type].push(fileUrl);
       });
     }
   }
@@ -407,7 +418,7 @@ const handleFileChange = (
 };
 // submit
 const handleFinish = async () => {
-  console.log(formState, "success");
+  console.log(formState.value, "success");
 
   // const requestParams: ProductDTO = {
   //   ...formState,
@@ -436,7 +447,7 @@ const handleFinish = async () => {
   // };
   let res;
   if (mode === "add") {
-    res = await createProductApi(formState);
+    res = await createProductApi(formState.value);
   }
   if (mode === "edit") {
   }
@@ -448,6 +459,17 @@ const handleFinish = async () => {
 
   console.log(res, "res");
 };
+
+onBeforeMount(async () => {});
+onMountedOrActivated(async () => {
+  await getOptions();
+  await getAllCategoryPropertiesMap();
+
+  transferInfoToForm(categoryPropertiesMap.value);
+  if (mode !== "add") {
+    initFormHandler();
+  }
+});
 </script>
 
 <style lang="less" scoped></style>
