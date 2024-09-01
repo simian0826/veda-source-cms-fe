@@ -84,11 +84,26 @@
 </template>
 
 <script lang="ts" setup>
-import { Button, Select, Table, Pagination } from "ant-design-vue";
-import { ref, h, onBeforeMount } from "vue";
-import { PlusCircleOutlined } from "@ant-design/icons-vue";
+import {
+  Button,
+  Select,
+  Table,
+  Pagination,
+  Modal,
+  message,
+} from "ant-design-vue";
+import { ref, h, onBeforeMount, createVNode } from "vue";
+import {
+  PlusCircleOutlined,
+  ExclamationCircleOutlined,
+} from "@ant-design/icons-vue";
 import { useRouter } from "vue-router";
-import { getProductListApi, getCategoryDictApi } from "/@/api/product";
+import {
+  getProductListApi,
+  getCategoryDictApi,
+  deleteProductApi,
+} from "/@/api/product";
+
 import type { Dict, Pagenigation } from "/@/api/model/baseModel";
 
 const router = useRouter();
@@ -147,7 +162,22 @@ const addNewProduct = () => {
 };
 // delete confirm
 const confirmDelete = (id) => {
-  console.log("id", id);
+  Modal.confirm({
+    title: "Warning?",
+    icon: createVNode(ExclamationCircleOutlined),
+    content: "Are you sure you want to delete this product?",
+    onOk: async () => {
+      const res = await deleteProductApi(Number(id));
+      if (res) {
+        message.success("Delete product successfully");
+        fetchProductList(true);
+      } else {
+        message.error("Delete product failed");
+      }
+    },
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    onCancel() {},
+  });
 };
 // pager change
 const handlePageChange = (page, size) => {

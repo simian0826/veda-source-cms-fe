@@ -1,11 +1,12 @@
 import { defHttp } from "/@/utils/http/axios";
 import { ContentTypeEnum } from "/@/enums/httpEnum";
 import { Dict, ListRequest, ListResult } from "../model/baseModel";
-import { ProductDTO, Product } from "./model";
+import { ProductDTO, Product, HeroSection } from "./model";
 
-enum Api {
+export enum Api {
   // upload
   Upload = "/storage/uploadFile",
+  AntUpload = "/veda-source/storage/uploadFileByAntd",
   // product
   GetCategoryDict = "/dict/findProductCategory", // get category dict
   GetAllCategoryProperties = "/productCategoryPropertyConfig/list", // get category properties by category
@@ -45,6 +46,12 @@ export const getProductApi = (id: number) => {
 export const createProductApi = (params: ProductDTO) => {
   return defHttp.post<boolean>({ url: Api.CreateProduct, params });
 };
+export const updateProductApi = (params: ProductDTO) => {
+  return defHttp.post<boolean>({ url: Api.UpdateProduct, params });
+};
+export const deleteProductApi = (id: number) => {
+  return defHttp.post<boolean>({ url: `${Api.DeleteProduct}/${id}` });
+};
 
 // upload file
 export const uploadImg = async (file) => {
@@ -70,45 +77,15 @@ export const uploadImg = async (file) => {
   );
 };
 
-// create product
-export const createProduct = async (params) => {
-  return defHttp.post({
-    url: Api.CreateProduct,
-    params,
-  });
-};
-
-// update product
-export const updateProduct = async (params) => {
-  return defHttp.post({
-    url: Api.UpdateProduct,
-    params,
-  });
-};
-
-// view product
-export const getProductDetail = async (id) => {
-  return defHttp.get({
-    url: `${Api.ViewProduct}/${id}`,
-  });
-};
-
-// delete product
-export const deleteProductById = async (id) => {
-  return defHttp.get({
-    url: `${Api.DeleteProduct}/${id}`,
-  });
-};
-
 //  get hero sections
-export const getHeroSections = async () => {
-  return defHttp.get({
+export const getHeroSectionsApi = async () => {
+  return defHttp.get<HeroSection[]>({
     url: Api.FindHeroSection,
   });
 };
 
 // create hero
-export const createHero = async (params) => {
+export const createHeroSectionApi = async (params) => {
   return defHttp.post({
     url: Api.CreateHero,
     params,
@@ -116,8 +93,8 @@ export const createHero = async (params) => {
 };
 
 // update hero
-export const updateHero = async (params) => {
-  return defHttp.post({
+export const updateHeroSectionApi = async (params: HeroSection[]) => {
+  return defHttp.post<boolean>({
     url: Api.UpdateHero,
     params,
   });

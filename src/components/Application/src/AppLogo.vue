@@ -4,7 +4,7 @@
 -->
 <template>
   <div class="anticon" :class="getAppLogoClass" @click="goHome">
-    <img class="w-full" src="/@/assets/logo-toyota.svg" />
+    <img class="w-full logo-img" src="/@/assets/logo-veda.png" />
     <div
       class="ml-2 truncate md:opacity-100"
       :class="getTitleClass"
@@ -72,7 +72,8 @@ function goHome() {
 .@{prefix-cls} {
   display: flex;
   align-items: center;
-  padding-left: 7px;
+  // padding-left: 7px;
+  padding: 0;
   cursor: pointer;
   transition: all 0.2s ease;
 
@@ -96,6 +97,11 @@ function goHome() {
     font-size: 16px;
     font-weight: 700;
     transition: all 0.5s;
+  }
+
+  .logo-img {
+    object-fit: contain;
+    background: #111;
   }
 }
 </style>

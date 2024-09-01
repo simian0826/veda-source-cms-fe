@@ -34,7 +34,7 @@
             :headers="uploadHeader"
             v-model:file-list="imgList"
             :beforeUpload="beforeUploadHandler"
-            action="/veda-source/storage/uploadFileByAntd"
+            :action="Api.AntUpload"
             list-type="picture-card"
             @change="
               (params) => {
@@ -52,7 +52,7 @@
           <Upload
             :headers="uploadHeader"
             v-model:file-list="certificationList"
-            action="/veda-source/storage/uploadFileByAntd"
+            :action="Api.AntUpload"
             list-type="picture-card"
             @change="
               (params) => {
@@ -106,12 +106,11 @@
           >
             <Input v-model:value="item.name" class="w-[200px]" />
             <Button
+              danger
               :icon="h(MinusCircleOutlined)"
               class="h-[36px] ml-4"
               @click="handleDeleteProperty(index)"
-            >
-              delete
-            </Button>
+            />
           </FormItem>
           <FormItem
             label="property values"
@@ -134,11 +133,41 @@
         <FormItem>
           <Button @click="handleAddProperty">add new porperty</Button>
         </FormItem>
-        <FormItem :wrapper-col="{ offset: 8, span: 16 }">
-          <Button v-if="mode !== 'detail'" type="primary" html-type="submit">
+        <FormItem>
+          <Button
+            class="mr-2"
+            v-if="mode !== 'detail'"
+            type="primary"
+            html-type="submit"
+          >
             Submit
           </Button>
-          <Button v-else type="primary">Edit</Button>
+          <Button
+            v-else
+            :disabled="false"
+            type="primary"
+            @click="
+              () => {
+                mode = 'edit';
+              }
+            "
+            class="mr-2"
+          >
+            Edit
+          </Button>
+          <Button
+            v-if="mode != 'add'"
+            :disabled="false"
+            type="primary"
+            danger
+            @click="
+              () => {
+                handleDelete();
+              }
+            "
+          >
+            Delete
+          </Button>
         </FormItem>
       </Form>
     </div>
@@ -147,9 +176,13 @@
 
 <script lang="ts" setup>
 // TODO: 详情，新增，编辑页面
-import { useRoute } from "vue-router";
-import { PlusOutlined, MinusCircleOutlined } from "@ant-design/icons-vue";
-import { computed, ref, h, onBeforeMount } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import {
+  PlusOutlined,
+  MinusCircleOutlined,
+  ExclamationCircleOutlined,
+} from "@ant-design/icons-vue";
+import { computed, ref, h, onBeforeMount, createVNode } from "vue";
 import { onMountedOrActivated } from "/@/hooks/core/onMountedOrActivated";
 import PropertyTag from "./components/PropertyTag.vue";
 import type { Rule } from "ant-design-vue/es/form";
@@ -157,8 +190,11 @@ import {
   getCategoryDictApi,
   getAllCategoryPropertiesApi,
   createProductApi,
+  updateProductApi,
+  deleteProductApi,
   getProductApi,
 } from "/@/api/product";
+import { Api } from "/@/api/product";
 import type { Dict } from "/@/api/model/baseModel";
 import type { ProductDTO } from "/@/api/product/model";
 import type { UploadChangeParam, UploadProps } from "ant-design-vue";
@@ -172,6 +208,7 @@ import {
   Textarea,
   Button,
   message,
+  Modal,
 } from "ant-design-vue";
 import { useUserStore } from "/@/store/modules/user";
 
@@ -180,11 +217,13 @@ const uploadHeader = {
   Authorization: userStore.getToken,
 };
 const route = useRoute();
-const mode = route.query.mode;
+const router = useRouter();
+
+const mode = ref(route.query.mode);
 
 const formState = ref<ProductDTO>({
   name: "",
-  category: "",
+  category: undefined,
   description: "",
   imgs: [],
   certificate: [],
@@ -207,13 +246,15 @@ const initFormHandler = async () => {
     thumbUrl: item,
   }));
 
-  certificationList.value = formState.value.certificate.map((item, index) => ({
-    uid: String(index),
-    name: item.substring(item.lastIndexOf("/") + 1),
-    status: "done",
-    url: item,
-    thumbUrl: item,
-  }));
+  certificationList.value = formState.value.certificate
+    ? formState.value.certificate?.map((item, index) => ({
+        uid: String(index),
+        name: item.substring(item.lastIndexOf("/") + 1),
+        status: "done",
+        url: item,
+        thumbUrl: item,
+      }))
+    : [];
 };
 
 const imgsValidator = async (_rule, value) => {
@@ -355,17 +396,17 @@ const getOptions = async () => {
   categoryOptions.value = res || [];
 };
 // format property value
-const formatPropertyValue = (items: string[]) => {
-  let _arr: any = [];
-  items.forEach((value) => {
-    _arr.push({
-      label: value,
-      value: value,
-    });
-  });
-};
+// const formatPropertyValue = (items: string[]) => {
+//   let _arr: any = [];
+//   items.forEach((value) => {
+//     _arr.push({
+//       label: value,
+//       value: value,
+//     });
+//   });
+// };
 const computedTitle = computed(() => {
-  switch (mode) {
+  switch (mode.value) {
     case "add":
       return "new product";
     case "detail":
@@ -408,7 +449,7 @@ const handleFileChange = (
         } else {
           fileUrl = item.response.data[0].url;
         }
-        formState.value[type].push(fileUrl);
+        formState.value[type]?.push(fileUrl);
       });
     }
   }
@@ -418,46 +459,45 @@ const handleFileChange = (
 };
 // submit
 const handleFinish = async () => {
-  console.log(formState.value, "success");
-
-  // const requestParams: ProductDTO = {
-  //   ...formState,
-  //   additionalProperties: formState.additionalProperties.map((property) => {
-  //     return {
-  //       name: property.name,
-  //       items: property.items.map((item) => {
-  //         return {
-  //           label: item,
-  //           value: item,
-  //         };
-  //       }),
-  //     };
-  //   }) as unknown as ProductProperty[],
-  //   properties: formState.properties.map((property) => {
-  //     return {
-  //       name: property.name,
-  //       items: property.items.map((item) => {
-  //         return {
-  //           label: item,
-  //           value: item,
-  //         };
-  //       }),
-  //     };
-  //   }) as unknown as ProductProperty[],
-  // };
   let res;
-  if (mode === "add") {
+  if (mode.value === "add") {
     res = await createProductApi(formState.value);
   }
-  if (mode === "edit") {
+  if (mode.value === "edit") {
+    res = await updateProductApi(formState.value);
   }
   if (res) {
-    message.success(mode + " product successfully");
+    message.success(mode.value + " product successfully");
+    router.push({
+      path: "/product",
+      replace: true,
+    });
   } else {
-    message.error(mode + "product successfully");
+    message.error(mode.value + "product failed");
   }
+};
 
-  console.log(res, "res");
+const handleDelete = () => {
+  Modal.confirm({
+    title: "Warning?",
+    icon: createVNode(ExclamationCircleOutlined),
+    content: "Are you sure you want to delete this product?",
+    onOk: async () => {
+      const { id } = route.query;
+      const res = await deleteProductApi(Number(id));
+      if (res) {
+        message.success("Delete product successfully");
+        router.push({
+          path: "/product",
+          replace: true,
+        });
+      } else {
+        message.error("Delete product failed");
+      }
+    },
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    onCancel() {},
+  });
 };
 
 onBeforeMount(async () => {});
@@ -466,11 +506,10 @@ onMountedOrActivated(async () => {
   await getAllCategoryPropertiesMap();
 
   transferInfoToForm(categoryPropertiesMap.value);
-  if (mode !== "add") {
+  if (mode.value !== "add") {
     initFormHandler();
   }
 });
 </script>
 
 <style lang="less" scoped></style>
-../../api/product

@@ -48,7 +48,7 @@ export function checkStatus(
       errMessage = "网络请求超时!";
       break;
     case 500:
-      errMessage = "服务器错误,请联系管理员!";
+      errMessage = "Server Error!";
       break;
     case 501:
       errMessage = "网络未实现!";
