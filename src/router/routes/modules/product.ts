@@ -9,6 +9,7 @@ const product: AppRouteModule[] = [
     component: LAYOUT,
     redirect: "/product/list",
     meta: {
+      orderNo: 4,
       antIcon: "ProfileOutlined",
       title: "Product",
     },
@@ -27,6 +28,7 @@ const product: AppRouteModule[] = [
         meta: {
           title: "Product Detail",
           hideMenu: true,
+          currentActiveMenu: "/product/list",
         },
         component: () => import("/@/views/product/Detail.vue"),
       },

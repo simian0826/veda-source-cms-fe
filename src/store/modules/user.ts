@@ -11,6 +11,7 @@ import {
 } from "/@/enums/cacheEnum";
 import { clearAuthCache, getAuthCache, setAuthCache } from "/@/utils/auth";
 import {
+  ChangePasswordDTO,
   GetUserInfoModel,
   LoginParams,
   RoleInfo,
@@ -25,6 +26,8 @@ import {
   refreshTokenApi,
   // doSSOLogoutApi,
   fetchExternalSSOUrlApi,
+  doLogoutApi,
+  changePasswordApi,
 } from "/@/api/sys/user";
 import { useMessage } from "/@/hooks/web/useMessage";
 import { router } from "/@/router";
@@ -169,7 +172,6 @@ export const useUserStore = defineStore({
         this.setUserInfo({ userId: userId, username: username });
 
         return this.afterLoginAction({ goHome });
-        
       } catch (error) {
         return Promise.reject(error);
       }
@@ -340,6 +342,19 @@ export const useUserStore = defineStore({
       }
       return userInfo;
     },
+    /**
+     * @description: external sso url
+     */
+    async changePasswordAction(params: ChangePasswordDTO) {
+      try {
+        const res = await changePasswordApi(params);
+        if (typeof res === "boolean" && res) {
+          await this.logout(true);
+        }
+      } catch (e) {
+        console.error("change password error", e);
+      }
+    },
 
     /**
      * @description: external sso url
@@ -362,16 +377,15 @@ export const useUserStore = defineStore({
      */
     async logout(goLogin = false) {
       const permissionStore = usePermissionStore();
-
-      if (this.token) {
+      if (this.getToken) {
         try {
           if (this.getLoginType === LoginTypeEnum.ACCOUT_LOGIN) {
-            // await doLogoutApi();
+            await doLogoutApi();
           } else {
             // await doSSOLogoutApi();
           }
-        } catch {
-          console.error("注销Token失败");
+        } catch (e) {
+          console.error("logout failed", e);
         } finally {
           this.setToken(undefined);
           this.setUserInfo(null);

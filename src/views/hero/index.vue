@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="font-size-[20px] mb-4">hero update</div>
+    <div class="font-size-[20px] mb-4">HeroSection Configuration</div>
     <!-- form  -->
     <div class="p-4 bg-white flex w-full">
       <Spin wrapperClassName="w-full" :spinning="loading">
@@ -67,7 +67,9 @@
             </FormItem>
           </Card>
           <FormItem>
-            <Button type="primary" html-type="submit">Submit</Button>
+            <div class="w-full flex justify-end">
+              <Button type="primary" html-type="submit">Submit</Button>
+            </div>
           </FormItem>
         </Form>
       </Spin>
@@ -89,11 +91,12 @@ import {
   Spin,
   message,
 } from "ant-design-vue";
-import { getHeroSectionsApi, updateHeroSectionApi } from "/@/api/product";
-import type { HeroSection, SystemModule } from "/@/api/product/model";
+import { getHeroSectionsApi, updateHeroSectionApi } from "/@/api";
+import type { HeroSection, SystemModule } from "/@/api/model/baseModel";
 import type { UploadChangeParam, UploadProps } from "ant-design-vue";
-import { Api } from "/@/api/product";
+import { Api } from "/@/api";
 import { useUserStore } from "/@/store/modules/user";
+import { convertImageUrlToUploadParam } from "/@/utils/index";
 
 type ModuleUploadProps = {
   [key in SystemModule]?: UploadProps["fileList"];
@@ -148,17 +151,9 @@ onMounted(async () => {
 
       if (formState.value.length > 0) {
         formState.value.forEach((item) => {
-          backgrounds.value[item.module] = [
-            {
-              uid: "1",
-              name: item.background.substring(
-                item.background.lastIndexOf("/") + 1,
-              ),
-              status: "done",
-              url: item.background,
-              thumbUrl: item.background,
-            },
-          ];
+          backgrounds.value[item.module] = convertImageUrlToUploadParam(
+            item.background,
+          );
         });
       }
       console.log(backgrounds.value);

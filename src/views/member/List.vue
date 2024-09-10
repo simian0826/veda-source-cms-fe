@@ -20,7 +20,7 @@
             <EditOutlined key="edit" @click="openMemberModal(item)" />
             <DeleteOutlined key="delete" @click="handleDelete(item.id)" />
           </template>
-          <Meta>
+          <CardMeta>
             <template #title>
               <div>{{ item.name }}</div>
             </template>
@@ -35,7 +35,7 @@
                 </template>
               </Tooltip>
             </template>
-          </Meta>
+          </CardMeta>
         </Card>
       </div>
 
@@ -110,6 +110,7 @@
 <script lang="ts" setup>
 import {
   Card,
+  CardMeta,
   Tooltip,
   Modal,
   Button,
@@ -146,7 +147,6 @@ const uploadHeader = {
   Authorization: userStore.getToken,
 };
 
-const { Meta } = Card;
 const memberModal = ref(false);
 const modalType = ref<"Create" | "Update">("Create");
 const createLoading = ref(false);
@@ -325,7 +325,7 @@ onMounted(async () => {
         object-position: 0 0;
       }
       .member-description {
-        min-height: 60px;
+        min-height: 66px;
         display: -webkit-box;
         -webkit-box-orient: vertical;
         -webkit-line-clamp: 3;

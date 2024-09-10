@@ -61,3 +61,8 @@ export interface GetUserInfoModel {
   officeName?: string; // 科室名称
   officeCode?: string; // 科室代码
 }
+
+export type ChangePasswordDTO = {
+  oldPassword: string;
+  newPassword: string;
+};

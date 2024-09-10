@@ -4,6 +4,7 @@ import {
   LoginParams,
   LoginResultModel,
   GetUserInfoModel,
+  ChangePasswordDTO,
 } from "./model/userModel";
 
 import { ErrorMessageMode } from "/#/axios";
@@ -12,7 +13,8 @@ import { PermissionEnum } from "/@/enums/permissionEnum";
 enum Api {
   Login = "/login",
   SSOLogin = "/auth/portalSsoLogin",
-  Logout = "/auth/logout",
+  Logout = "/logout",
+  ChangePassword = "/changePassword",
   SSOLogout = "/auth/portalSsoLogout",
   GetUserInfo = "/gen2-system/user/getUserInfo",
   GetPermCode = "/gen2-system/user/getUserPermCodes",
@@ -65,6 +67,16 @@ export function getUserInfoApi() {
 }
 
 /**
+ * @description: getUserInfo
+ */
+export function changePasswordApi(params: ChangePasswordDTO) {
+  return defHttp.post<boolean>({
+    url: Api.ChangePassword,
+    params,
+  });
+}
+
+/**
  * @description: changeRole
  */
 export function changeRoleApi(params: { roleId: number }) {
@@ -78,7 +90,7 @@ export function getPermCodeApi() {
 }
 
 export function doLogoutApi() {
-  return defHttp.delete({ url: Api.Logout });
+  return defHttp.post({ url: Api.Logout });
 }
 export function doSSOLogoutApi() {
   return defHttp.post({ url: Api.SSOLogout });

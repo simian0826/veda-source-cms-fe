@@ -123,7 +123,6 @@ async function handleLogin() {
         mode: "none", //不要默认的错误提示
       }),
     );
-    debugger
     if (result) {
       notification.success({
         message: "LOGIN was successfully",

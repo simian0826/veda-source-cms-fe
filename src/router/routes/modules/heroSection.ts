@@ -6,16 +6,17 @@ const heroSection: AppRouteModule[] = [
     path: "/hero",
     name: "Hero",
     component: LAYOUT,
-    redirect: "/member/list",
+    redirect: "/hero/config",
     meta: {
-      orderNo: 10000,
-      antIcon: "TeamOutlined",
+      orderNo: 2,
+      antIcon: "PictureOutlined",
       title: "Hero Section",
+      hideChildrenInMenu: true,
     },
     children: [
       {
-        path: "detail",
-        name: "HeroDetail",
+        path: "config",
+        name: "config",
         meta: {
           title: "Configuration",
         },

@@ -6,6 +6,7 @@ import type { App, Component } from "vue";
 
 import { unref } from "vue";
 import { isObject } from "/@/utils/is";
+import { UploadFile, UploadProps } from "ant-design-vue";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 export const noop = () => {};
@@ -147,4 +148,48 @@ export function timeBasedExecution(
     });
   }
   run();
+}
+
+export function convertImageUrlToUploadParam(
+  url: string | string[],
+): UploadProps["fileList"] {
+  if (Array.isArray(url)) {
+    return url.map((item, index) => ({
+      uid: `-${index}`,
+      name: item.substring(item.lastIndexOf("/") + 1),
+      status: "done",
+      url: item,
+      thumbUrl: item,
+    }));
+  } else {
+    return [
+      {
+        uid: `-${1}`,
+        name: url.substring(url.lastIndexOf("/") + 1),
+        status: "done",
+        url: url,
+        thumbUrl: url,
+      },
+    ];
+  }
+}
+
+export function convertImageUploadParamToUrl(
+  uploadProps: UploadProps["fileList"] | UploadFile[],
+): string | string[] {
+  const result = uploadProps?.map((item) => {
+    let fileUrl = "";
+    if (item.url) {
+      fileUrl = item.url;
+    } else {
+      fileUrl = item.response.data[0].url;
+    }
+    return fileUrl;
+  });
+
+  if (result?.length == 1) {
+    return result[0];
+  }
+
+  return result ?? "";
 }

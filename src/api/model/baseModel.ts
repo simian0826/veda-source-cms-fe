@@ -1,3 +1,7 @@
+import { UploadFile, UploadProps } from "ant-design-vue";
+import { Member } from "../member/model";
+import { Product } from "../product/model";
+
 export interface BasicPageParams {
   page: number;
   pageSize: number;
@@ -32,23 +36,128 @@ export interface OptionModel {
   children?: OptionModel[];
 }
 
-export interface FormListModel {
-  isSearch?: boolean | undefined;
-  label?: string;
-  field: string;
-  type: string;
-  dict?: string;
-  width?: string;
-  options?: OptionModel[];
-  hasChange?: string;
-  notShow?: boolean;
-  disabled?: boolean;
-  onChange?: (value: string) => void;
-}
-
 export type SelectOptionsModel = Dict;
 
 export type Dict = {
   label: string;
   value: string;
+};
+
+export type SystemModule =
+  | "home"
+  | "product"
+  | "project"
+  | "about us"
+  | "contact us";
+
+export type HeroSection = {
+  id?: number;
+  header?: string;
+  content?: string;
+  background: string;
+  module: SystemModule;
+};
+
+export type BasicInfo = {
+  email?: string;
+  address?: string;
+};
+
+export type HomePageContent = {
+  processItems: HomeProcessItem[];
+  introductionItems: HomeIntroductionItem[];
+  productCategoryItems: HomeProductionCategoryItem[];
+  leaders: Member[];
+  clientLogos: string[];
+};
+
+export type HomePageContentDTO = {
+  processItems: HomeProcessItem[];
+  introductionItems: HomeIntroductionItem[];
+  productCategoryItems: HomeProductionCategoryItem[];
+  leaders: number[];
+  clientLogos: string[];
+};
+
+export type HomeIntroductionItem = {
+  title: string;
+  subTitle: string;
+  description: string;
+  image: string;
+  infoRight: IntroductionInfo;
+  infoLeft: IntroductionInfo;
+  productId: number;
+};
+
+export type HomeProcessItem = {
+  title: number;
+  image: string;
+  detailText: string;
+};
+export type IntroductionInfo = {
+  info: string;
+  supplementary: string;
+};
+
+export type HomeProductionCategoryItem = {
+  title: string;
+  image: string;
+  category: string;
+};
+
+export type HomePageContentVO = {
+  processItems: HomeProcessItemVO[];
+  introductionItems: HomeIntroductionItemVO[];
+  productCategoryItems: HomeProductionCategoryItemVO[];
+  leaders: Member[];
+  clientLogos: UploadProps["fileList"] | UploadFile[];
+};
+
+export type HomeIntroductionItemVO = {
+  title: string;
+  subTitle: string;
+  description: string;
+  image: UploadProps["fileList"] | UploadFile[];
+  infoRight: IntroductionInfo;
+  infoLeft: IntroductionInfo;
+  product: Product;
+};
+
+export type HomeProcessItemVO = {
+  title: number;
+  image: UploadProps["fileList"] | UploadFile[];
+  detailText: string;
+};
+
+export type HomeProductionCategoryItemVO = {
+  title: number;
+  image: UploadProps["fileList"] | UploadFile[];
+  category: string;
+};
+
+export type AboutUsPage = {
+  qualityItems: AboutUsQualityItem[];
+  needHelpHeader: string;
+  needHelpDesc: string;
+  teamMembers: Member[];
+};
+
+export type AboutUsQualityItem = {
+  title: string;
+  desc: string;
+  image: string;
+};
+
+export type AboutUsPageVO = Omit<AboutUsPage, "qualityItems"> & {
+  qualityItems: AboutUsQualityItemVO[];
+};
+
+export type AboutUsQualityItemVO = {
+  title: string;
+  desc: string;
+  image: UploadProps["fileList"] | UploadFile[];
+};
+
+export type AboutUsPageDTO = Omit<AboutUsPage, "teamMembers"> & {
+  teamMembers: number[];
 };

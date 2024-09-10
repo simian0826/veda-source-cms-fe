@@ -9,7 +9,8 @@ const member: AppRouteModule[] = [
     component: LAYOUT,
     redirect: "/member/list",
     meta: {
-      antIcon: "PictureOutlined",
+      orderNo: 3,
+      antIcon: "TeamOutlined",
       title: "Member",
     },
     children: [

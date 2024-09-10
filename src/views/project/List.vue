@@ -1,18 +1,21 @@
 <template>
   <div>
     <!-- title -->
-    <div class="font-size-[20px] mb-4">Product List</div>
+    <div class="font-size-[20px] mb-4">Project List</div>
 
     <div class="bg-white p-4">
       <div class="mb-4 flex justify-between">
         <div>
-          <span><strong>category:</strong></span>
-          <Select
-            :value="selectedCategory"
-            :options="categories"
-            class="w-[200px] ml-4"
-            @change="categoryChangeHandler"
-          />
+          <span class="mr-2"><strong>Type:</strong></span>
+          <Radio.Group
+            v-model:value="selectedType"
+            button-style="solid"
+            @change="typeChangeHandler"
+          >
+            <Radio.Button value="">All</Radio.Button>
+            <Radio.Button value="completed">Completed</Radio.Button>
+            <Radio.Button value="onGoing">OnGoing</Radio.Button>
+          </Radio.Group>
         </div>
         <Button
           type="primary"
@@ -26,15 +29,15 @@
         <Table
           :columns="columns"
           row-key="id"
-          :data-source="productList"
+          :data-source="projectList"
           :pagination="false"
         >
           <template #bodyCell="{ column, record }">
-            <template v-if="column.key === 'images'">
+            <template v-if="column.key === 'projectImages'">
               <div class="flex flex-justify-start">
                 <img
                   class="w-[100px] mr-4"
-                  v-for="item in record.imgs"
+                  v-for="item in record.projectImages"
                   :src="item"
                   :key="item"
                 />
@@ -76,12 +79,11 @@
 <script lang="ts" setup>
 import {
   Button,
-  Select,
   Table,
   Pagination,
   Modal,
   message,
-  Spin,
+  Radio,
 } from "ant-design-vue";
 import { ref, h, onBeforeMount, createVNode } from "vue";
 import {
@@ -89,18 +91,13 @@ import {
   ExclamationCircleOutlined,
 } from "@ant-design/icons-vue";
 import { useRouter } from "vue-router";
-import {
-  getProductListApi,
-  getCategoryDictApi,
-  deleteProductApi,
-} from "/@/api/product";
+import { getProjectListApi, deleteProjectApi } from "/@/api/project";
 
-import type { Dict, Pagenigation } from "/@/api/model/baseModel";
+import type { Pagenigation } from "/@/api/model/baseModel";
 
 const router = useRouter();
 const listLoading = ref(false);
-const categories = ref<Dict[]>([{ label: "All", value: "" }]);
-const selectedCategory = ref();
+const selectedType = ref("");
 const pagenigation = ref<Pagenigation>({
   page: 1,
   pageSize: 10,
@@ -108,21 +105,25 @@ const pagenigation = ref<Pagenigation>({
 });
 const columns = [
   {
-    title: "Name",
-    dataIndex: "name",
-    key: "name",
+    title: "Title",
+    dataIndex: "title",
+    key: "title",
     width: 250,
   },
   {
-    title: "Category",
-    dataIndex: "category",
-    width: 250,
+    title: "Type",
+    dataIndex: "type",
+    width: 50,
   },
-
   {
-    title: "Product Images",
-    key: "images",
-    dataIndex: "imgs",
+    title: "Location",
+    dataIndex: "location",
+    width: 150,
+  },
+  {
+    title: "Project Images",
+    key: "projectImages",
+    dataIndex: "projectImages",
   },
   {
     title: "Action",
@@ -131,11 +132,11 @@ const columns = [
   },
 ];
 
-const productList = ref();
+const projectList = ref();
 // to detail
 const jumpTo = (id, type) => {
   router.push({
-    path: `/product/detail`,
+    path: `/project/detail`,
     query: {
       id,
       mode: type,
@@ -145,7 +146,7 @@ const jumpTo = (id, type) => {
 // to new
 const addNewProduct = () => {
   router.push({
-    path: `/product/detail`,
+    path: `/project/detail`,
     query: {
       mode: "add",
     },
@@ -156,14 +157,14 @@ const confirmDelete = (id) => {
   Modal.confirm({
     title: "Warning?",
     icon: createVNode(ExclamationCircleOutlined),
-    content: "Are you sure you want to delete this product?",
+    content: "Are you sure you want to delete this project?",
     onOk: async () => {
-      const res = await deleteProductApi(Number(id));
+      const res = await deleteProjectApi(Number(id));
       if (res) {
-        message.success("Delete product successfully");
+        message.success("Delete project successfully");
         fetchProductList(true);
       } else {
-        message.error("Delete product failed");
+        message.error("Delete project failed");
       }
     },
     // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -181,21 +182,21 @@ const handlePageChange = (page, size) => {
 const fetchProductList = async (isInit = false) => {
   if (isInit) {
     pagenigation.value.page = 1;
-    productList.value = [];
+    projectList.value = [];
     pagenigation.value.total = 0;
     pagenigation.value.pageSize = 10;
   }
 
   try {
     listLoading.value = true;
-    const res = await getProductListApi({
-      category: selectedCategory.value,
+    const res = await getProjectListApi({
+      type: selectedType.value,
       page: pagenigation.value.page,
       pageSize: pagenigation.value.pageSize,
     });
 
     if (res.list.length > 0) {
-      productList.value.push(...res.list);
+      projectList.value.push(...res.list);
     }
     pagenigation.value.total = res.total;
     pagenigation.value.page++;
@@ -204,23 +205,14 @@ const fetchProductList = async (isInit = false) => {
   }
 };
 
-const fetchCategoryDict = async () => {
-  const res = await getCategoryDictApi();
-
-  categories.value = [...categories.value, ...res];
-};
-
-const categoryChangeHandler = (categoryItem: Dict) => {
-  selectedCategory.value = categoryItem;
+const typeChangeHandler = (e) => {
+  console.log(e.target.value);
+  selectedType.value = e.target.value;
   fetchProductList(true);
 };
 
 onBeforeMount(async () => {
-  await fetchCategoryDict();
-  if (categories.value.length > 0) {
-    selectedCategory.value = categories.value[0].value;
-    fetchProductList(true);
-  }
+  fetchProductList(true);
 });
 </script>
 

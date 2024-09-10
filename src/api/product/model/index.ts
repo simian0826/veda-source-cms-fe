@@ -19,18 +19,3 @@ export type ProductProperty = {
 export type ProductDTO = {
   additionalProperties: ProductProperty[];
 } & Product;
-
-export type SystemModule =
-  | "home"
-  | "product"
-  | "project"
-  | "about us"
-  | "contact us";
-
-export type HeroSection = {
-  id?: number;
-  header?: string;
-  content?: string;
-  background: string;
-  module: SystemModule;
-};

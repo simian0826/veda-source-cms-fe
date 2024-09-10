@@ -3,124 +3,82 @@
     <!-- title -->
     <h2>{{ computedTitle }}</h2>
     <div class="p-4 bg-white flex">
-      <Form
-        name="basic"
-        class="w-full p-4"
-        :rules="rules"
-        :disabled="mode === 'detail'"
-        :label-col="{ style: { width: '150px' } }"
-        :model="formState"
-        @finish="handleFinish"
-      >
-        <FormItem label="product name" name="name">
-          <Input v-model:value="formState.name" placeholder="please enter" />
-        </FormItem>
-        <FormItem label="product category" name="category">
-          <Select
-            v-model:value="formState.category"
-            :options="categoryOptions"
-            @change="handleChangeCategory"
-            placeholder="please select"
-          />
-        </FormItem>
-        <FormItem label="product description" name="description">
-          <Textarea
-            v-model:value="formState.description"
-            placeholder="please enter"
-          />
-        </FormItem>
-        <FormItem label="product images" name="imgs">
-          <Upload
-            :headers="uploadHeader"
-            v-model:file-list="imgList"
-            :beforeUpload="beforeUploadHandler"
-            :action="Api.AntUpload"
-            list-type="picture-card"
-            @change="
-              (params) => {
-                handleFileChange(params, 'imgs');
-              }
-            "
-          >
-            <div v-if="imgList && imgList.length < 3">
-              <plus-outlined />
-              <div style="margin-top: 8px">Upload</div>
-            </div>
-          </Upload>
-        </FormItem>
-        <FormItem label="product certifacate" name="certificate">
-          <Upload
-            :headers="uploadHeader"
-            v-model:file-list="certificationList"
-            :action="Api.AntUpload"
-            list-type="picture-card"
-            @change="
-              (params) => {
-                handleFileChange(params, 'certificate');
-              }
-            "
-          >
-            <div v-if="certificationList && certificationList.length < 3">
-              <plus-outlined />
-              <div style="margin-top: 8px">Upload</div>
-            </div>
-          </Upload>
-        </FormItem>
-        <FormItem
-          v-for="(item, index) in formState.properties"
-          :key="item.name"
-          :name="['properties', index]"
-          :label="item.name"
-          :rules="[
-            {
-              type: 'array',
-              required: true,
-              message: 'please set at least one property',
-              trigger: 'blur',
-              validator: propertyValidator,
-            },
-          ]"
+      <Spin wrapperClassName="w-full" :spinning="loading">
+        <Form
+          name="basic"
+          class="w-full p-4"
+          :rules="rules"
+          :disabled="mode === 'detail'"
+          :label-col="{ style: { width: '150px' } }"
+          :model="formState"
+          @finish="handleFinish"
         >
-          <PropertyTag
-            v-model:items="item.items"
-            :disabled="mode === 'detail'"
-          />
-        </FormItem>
-        <Card
-          v-for="(item, index) in formState.additionalProperties"
-          :key="index"
-          class="mb-4 px-0 py-4 pb-0"
-        >
+          <FormItem label="product name" name="name">
+            <Input v-model:value="formState.name" placeholder="please enter" />
+          </FormItem>
+          <FormItem label="product category" name="category">
+            <Select
+              v-model:value="formState.category"
+              :options="categoryOptions"
+              @change="handleChangeCategory"
+              placeholder="please select"
+            />
+          </FormItem>
+          <FormItem label="product description" name="description">
+            <Textarea
+              v-model:value="formState.description"
+              placeholder="please enter"
+            />
+          </FormItem>
+          <FormItem label="product images" name="imgs">
+            <Upload
+              :headers="uploadHeader"
+              v-model:file-list="imgList"
+              :beforeUpload="beforeUploadHandler"
+              :action="Api.AntUpload"
+              list-type="picture-card"
+              @change="
+                (params) => {
+                  handleFileChange(params, 'imgs');
+                }
+              "
+            >
+              <div v-if="imgList && imgList.length < 3">
+                <plus-outlined />
+                <div style="margin-top: 8px">Upload</div>
+              </div>
+            </Upload>
+          </FormItem>
+          <FormItem label="product certifacate" name="certificate">
+            <Upload
+              :headers="uploadHeader"
+              v-model:file-list="certificationList"
+              :action="Api.AntUpload"
+              list-type="picture-card"
+              @change="
+                (params) => {
+                  handleFileChange(params, 'certificate');
+                }
+              "
+            >
+              <div v-if="certificationList && certificationList.length < 3">
+                <plus-outlined />
+                <div style="margin-top: 8px">Upload</div>
+              </div>
+            </Upload>
+          </FormItem>
           <FormItem
-            :name="['additionalProperties', index, 'name']"
-            label="property name"
+            v-for="(item, index) in formState.properties"
+            :key="item.name"
+            :name="['properties', index]"
+            :label="item.name"
             :rules="[
               {
                 type: 'array',
                 required: true,
-                message: 'property name can not be empty',
-                trigger: 'change',
-                validator: addtionalPropertyNameValidator,
-              },
-            ]"
-          >
-            <Input v-model:value="item.name" class="w-[200px]" />
-            <Button
-              danger
-              :icon="h(MinusCircleOutlined)"
-              class="h-[36px] ml-4"
-              @click="handleDeleteProperty(index)"
-            />
-          </FormItem>
-          <FormItem
-            label="property values"
-            :name="['additionalProperties', index, 'items']"
-            :rules="[
-              {
-                required: true,
-                message: 'property item can not be empty',
+                message: 'please set at least one property',
                 trigger: 'blur',
-                validator: addtionalPropertyItemValidator,
+                validator: propertyValidator,
               },
             ]"
           >
@@ -129,47 +87,107 @@
               :disabled="mode === 'detail'"
             />
           </FormItem>
-        </Card>
-        <FormItem>
-          <Button @click="handleAddProperty">add new porperty</Button>
-        </FormItem>
-        <FormItem>
-          <Button
-            class="mr-2"
-            v-if="mode !== 'detail'"
-            type="primary"
-            html-type="submit"
+          <Card
+            v-for="(item, index) in formState.additionalProperties"
+            :key="index"
+            class="mb-4 px-0 py-4 pb-0"
           >
-            Submit
-          </Button>
-          <Button
-            v-else
-            :disabled="false"
-            type="primary"
-            @click="
-              () => {
-                mode = 'edit';
-              }
-            "
-            class="mr-2"
-          >
-            Edit
-          </Button>
-          <Button
-            v-if="mode != 'add'"
-            :disabled="false"
-            type="primary"
-            danger
-            @click="
-              () => {
-                handleDelete();
-              }
-            "
-          >
-            Delete
-          </Button>
-        </FormItem>
-      </Form>
+            <FormItem
+              :name="['additionalProperties', index, 'name']"
+              label="property name"
+              :rules="[
+                {
+                  type: 'array',
+                  required: true,
+                  message: 'property name can not be empty',
+                  trigger: 'change',
+                  validator: addtionalPropertyNameValidator,
+                },
+              ]"
+            >
+              <Input v-model:value="item.name" class="w-[200px]" />
+              <Button
+                danger
+                :icon="h(MinusCircleOutlined)"
+                class="h-[36px] ml-4"
+                @click="handleDeleteProperty(index)"
+              />
+            </FormItem>
+            <FormItem
+              label="property values"
+              :name="['additionalProperties', index, 'items']"
+              :rules="[
+                {
+                  required: true,
+                  message: 'property item can not be empty',
+                  trigger: 'blur',
+                  validator: addtionalPropertyItemValidator,
+                },
+              ]"
+            >
+              <PropertyTag
+                v-model:items="item.items"
+                :disabled="mode === 'detail'"
+              />
+            </FormItem>
+          </Card>
+          <FormItem v-if="mode !== 'detail'">
+            <Button @click="handleAddProperty">add new porperty</Button>
+          </FormItem>
+          <FormItem>
+            <div class="w-full flex justify-end">
+              <Button
+                class="mr-2"
+                v-if="mode !== 'detail'"
+                type="primary"
+                html-type="submit"
+                :loading="operationLoading"
+              >
+                Submit
+              </Button>
+              <Button
+                v-else
+                :disabled="false"
+                type="primary"
+                @click="
+                  () => {
+                    mode = 'edit';
+                  }
+                "
+                class="mr-2"
+              >
+                Edit
+              </Button>
+              <Button
+                v-if="mode != 'add'"
+                :disabled="false"
+                class="mr-2"
+                type="primary"
+                danger
+                @click="
+                  () => {
+                    handleDelete();
+                  }
+                "
+              >
+                Delete
+              </Button>
+              <Button
+                class="mr-2"
+                v-if="mode !== 'detail'"
+                @click="
+                  () => {
+                    mode = 'detail';
+                  }
+                "
+              >
+                Detail
+              </Button>
+              <Button @click="router.go(-1)" :disabled="false">Go Back</Button>
+            </div>
+          </FormItem>
+        </Form>
+      </Spin>
     </div>
   </div>
 </template>
@@ -209,8 +227,10 @@ import {
   Button,
   message,
   Modal,
+  Spin,
 } from "ant-design-vue";
 import { useUserStore } from "/@/store/modules/user";
+import { convertImageUrlToUploadParam } from "/@/utils/index";
 
 const userStore = useUserStore();
 const uploadHeader = {
@@ -220,6 +240,9 @@ const route = useRoute();
 const router = useRouter();
 
 const mode = ref(route.query.mode);
+
+const loading = ref(false);
+const operationLoading = ref(false);
 
 const formState = ref<ProductDTO>({
   name: "",
@@ -234,27 +257,20 @@ const imgList = ref<UploadProps["fileList"]>([]);
 const certificationList = ref<UploadProps["fileList"]>();
 const initFormHandler = async () => {
   const { id } = route.query;
+  try {
+    loading.value = true;
+    const res = await getProductApi(Number(id));
+    formState.value = res;
+    imgList.value = convertImageUrlToUploadParam(formState.value.imgs);
 
-  const res = await getProductApi(Number(id));
-  formState.value = res;
-
-  imgList.value = formState.value.imgs.map((item, index) => ({
-    uid: String(index),
-    name: item.substring(item.lastIndexOf("/") + 1),
-    status: "done",
-    url: item,
-    thumbUrl: item,
-  }));
-
-  certificationList.value = formState.value.certificate
-    ? formState.value.certificate?.map((item, index) => ({
-        uid: String(index),
-        name: item.substring(item.lastIndexOf("/") + 1),
-        status: "done",
-        url: item,
-        thumbUrl: item,
-      }))
-    : [];
+    certificationList.value = formState.value.certificate
+      ? convertImageUrlToUploadParam(formState.value.certificate)
+      : [];
+  } catch (e) {
+    console.error(e);
+  } finally {
+    loading.value = false;
+  }
 };
 
 const imgsValidator = async (_rule, value) => {
@@ -277,8 +293,6 @@ const propertyValidator = async (_rule, value) => {
   return Promise.resolve();
 };
 const addtionalPropertyNameValidator = async (_rule, value) => {
-  console.log(value);
-
   if (!value) {
     return Promise.reject("Please input the property name");
   } else {
@@ -362,7 +376,6 @@ const transferInfoToForm = (properties: any) => {
         items: _str,
       });
     });
-  console.log(formState.value, "formState");
 };
 
 const categoryOptions = ref<Dict[]>([]);
@@ -370,7 +383,6 @@ const categoryPropertiesMap = ref({});
 
 // change properties by select category
 const handleChangeCategory = (val) => {
-  console.log(val, categoryPropertiesMap.value[val], "val");
   if (!val) return;
   const _proArr = categoryPropertiesMap.value[val];
   const _arr: any = [];
@@ -381,18 +393,19 @@ const handleChangeCategory = (val) => {
     });
   });
   formState.value.properties = _arr;
-  console.log(_proArr, "xxx");
 };
 // get all category properties
 const getAllCategoryPropertiesMap = async () => {
-  const res = await getAllCategoryPropertiesApi();
-  console.log(res, "properties res");
-  categoryPropertiesMap.value = res;
+  try {
+    const res = await getAllCategoryPropertiesApi();
+    categoryPropertiesMap.value = res;
+  } catch (e) {
+    console.error(e);
+  }
 };
 // get dict options
 const getOptions = async () => {
   const res = await getCategoryDictApi();
-  console.log("category dict res", res);
   categoryOptions.value = res || [];
 };
 // format property value
@@ -408,11 +421,11 @@ const getOptions = async () => {
 const computedTitle = computed(() => {
   switch (mode.value) {
     case "add":
-      return "new product";
+      return "Add Product";
     case "detail":
-      return "product detail";
+      return "Product Detail";
     case "edit":
-      return "update product";
+      return "Update Product";
     default:
       return "";
   }
@@ -459,21 +472,31 @@ const handleFileChange = (
 };
 // submit
 const handleFinish = async () => {
-  let res;
-  if (mode.value === "add") {
-    res = await createProductApi(formState.value);
-  }
-  if (mode.value === "edit") {
-    res = await updateProductApi(formState.value);
-  }
-  if (res) {
-    message.success(mode.value + " product successfully");
-    router.push({
-      path: "/product",
-      replace: true,
-    });
-  } else {
+  try {
+    operationLoading.value = true;
+    let res;
+
+    if (mode.value === "add") {
+      res = await createProductApi(formState.value);
+    }
+    if (mode.value === "edit") {
+      res = await updateProductApi(formState.value);
+    }
+    if (res) {
+      message.success(mode.value + " product successfully");
+      router.push({
+        path: "/product",
+        replace: true,
+      });
+    } else {
+      message.error(mode.value + "product failed");
+    }
+  } catch (e) {
     message.error(mode.value + "product failed");
+
+    console.error(e);
+  } finally {
+    operationLoading.value = false;
   }
 };
 
@@ -482,6 +505,9 @@ const handleDelete = () => {
     title: "Warning?",
     icon: createVNode(ExclamationCircleOutlined),
     content: "Are you sure you want to delete this product?",
+    okButtonProps: {
+      loading: operationLoading.value,
+    },
     onOk: async () => {
       const { id } = route.query;
       const res = await deleteProductApi(Number(id));

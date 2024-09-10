@@ -27,7 +27,7 @@ export function checkStatus(
     // Return to the current page after successful login. This step needs to be operated on the login page.
     case 401:
       userStore.setToken(undefined);
-      errMessage = msg || "用户没有权限（令牌、用户名、密码错误）!";
+      errMessage = msg || "No Authrization";
       if (stp === SessionTimeoutProcessingEnum.PAGE_COVERAGE) {
         userStore.setSessionTimeout(true);
       } else {
