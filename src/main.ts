@@ -14,7 +14,11 @@ import { setupErrorHandle } from "/@/logics/error-handle";
 import { setupGlobDirectives } from "./directives";
 import { initAppConfigStore } from "./logics/initAppConfig";
 import "/@/design/ant/antd.less";
-// register Swiper custom elements
+// import { env } from "@xenova/transformers";
+// env.allowLocalModels = true;
+// env.allowRemoteModels = false;
+// env.localModelPath = "/models/";
+// env.backends.onnx.wasm.wasmPaths = "/file/";
 
 async function bootstrap() {
   const app = createApp(App);
