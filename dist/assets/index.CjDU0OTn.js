@@ -1,1 +1,0 @@
-import{k as r}from"./index.owl8yoTw.js";const s=e=>r.get({url:"/person/list",params:e}),p=e=>r.post({url:"/person/create",params:e}),o=e=>r.post({url:"/person/update",params:e}),n=e=>r.post({url:"/person/delete/".concat(e)});export{p as c,n as d,s as g,o as u};
