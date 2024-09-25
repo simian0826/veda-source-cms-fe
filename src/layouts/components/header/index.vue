@@ -45,7 +45,6 @@
         class="w-full p-4"
         :label-col="{ style: { width: '150px' } }"
         :model="form"
-        @finish="handleHomeFinish"
       >
         <FormItem
           name="oldPassword"

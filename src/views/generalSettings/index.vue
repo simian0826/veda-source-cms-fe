@@ -983,7 +983,7 @@ const productPagenigation = ref<Pagenigation>({
 });
 
 const categoryChangeHandler = (categoryItem: Dict) => {
-  selectedCategory.value = categoryItem;
+  selectedCategory.value = categoryItem.value;
   fetchProductList(true);
 };
 const handleProductPageChange = (page, size) => {
@@ -1034,6 +1034,7 @@ const handleOpenProductModal = (index) => {
 const handleComfirmChooseProduct = () => {
   homePageContent.value.introductionItems[introductionItemIndex.value].product =
     selectedProduct;
+  selectedProduct;
   productModal.value = false;
 };
 

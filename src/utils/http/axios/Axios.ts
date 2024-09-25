@@ -5,7 +5,7 @@ import type {
   AxiosError,
   InternalAxiosRequestConfig,
 } from "axios";
-import type { RequestOptions, UploadFileParams } from "../../../../types/axios";
+import type { RequestOptions } from "../../../../types/axios";
 import type { CreateAxiosOptions } from "./axiosTransform";
 import axios from "axios";
 import qs from "qs";
