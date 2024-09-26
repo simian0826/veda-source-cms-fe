@@ -60,19 +60,6 @@
           />
         </FormItem>
         <FormItem
-          name="confirmPassword"
-          label="Confirm Password"
-          :rules="{
-            required: true,
-            message: 'Missing confirmation password',
-          }"
-        >
-          <InputPassword
-            v-model:value="form.confirmPassword"
-            placeholder="please enter"
-          />
-        </FormItem>
-        <FormItem
           name="newPassword"
           label="New Password"
           :rules="{
@@ -82,6 +69,19 @@
         >
           <InputPassword
             v-model:value="form.newPassword"
+            placeholder="please enter"
+          />
+        </FormItem>
+        <FormItem
+          name="confirmPassword"
+          label="Confirm Password"
+          :rules="{
+            required: true,
+            message: 'Missing confirmation password',
+          }"
+        >
+          <InputPassword
+            v-model:value="form.confirmPassword"
             placeholder="please enter"
           />
         </FormItem>
