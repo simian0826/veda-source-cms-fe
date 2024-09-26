@@ -1,1 +1,0 @@
-System.register(["./index-legacy.Dl2bfLoq.js"],(function(n,t){"use strict";var e,c,i;return{setters:[function(n){e=n.o,c=n.aU,i=n.aT}],execute:function(){n("o",(function(n){var t;e((function(){n(),c((function(){t=!0}))})),i((function(){t&&n()}))}))}}}));

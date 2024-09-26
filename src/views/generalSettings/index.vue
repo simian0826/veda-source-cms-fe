@@ -1099,7 +1099,7 @@ const handleChooseProduct = (product: Product) => {
     return;
   }
   if (selectedProduct.value.id == product.id) {
-    selectedProduct.value = null;
+    selectedProduct.value = undefined;
   } else {
     selectedProduct.value = product;
   }
@@ -1108,7 +1108,7 @@ const handleChooseProduct = (product: Product) => {
 
 const handleComfirmChooseMember = () => {
   if (activeKey.value == TabType.Home) {
-    homePageContent.value.leaders = [...selectedMembers.value];
+    homePageContent.value && homePageContent.value.leaders = [...selectedMembers.value];
   } else if (activeKey.value == TabType.AboutUs) {
     aboutUs.value.teamMembers = [...selectedMembers.value];
   }
