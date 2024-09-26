@@ -23,8 +23,8 @@ export default ({ mode }: ConfigEnv): UserConfigExport => {
     //VITE_GLOB_API_URL_PREFIX
   } = loadEnv(mode, root);
   return {
-    // base: "./",
-    base: root,
+    base: "./",
+    // base: root,
     build: {
       rollupOptions: {
         output: {
