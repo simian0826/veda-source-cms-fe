@@ -1108,7 +1108,7 @@ const handleChooseProduct = (product: Product) => {
 
 const handleComfirmChooseMember = () => {
   if (activeKey.value == TabType.Home) {
-    homePageContent.value && homePageContent.value.leaders = [...selectedMembers.value];
+    homePageContent.value.leaders = [...selectedMembers.value];
   } else if (activeKey.value == TabType.AboutUs) {
     aboutUs.value.teamMembers = [...selectedMembers.value];
   }
