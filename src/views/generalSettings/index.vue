@@ -934,6 +934,12 @@ import type {
   AboutUsPageDTO,
   Pagenigation,
   Dict,
+  HomeProductionCategoryItemVO,
+  AboutUsQualityItemVO,
+  HomeProcessItem,
+  HomeIntroductionItemDTO,
+  HomeProductionCategoryItem,
+  AboutUsQualityItem,
 } from "/@/api/model/baseModel";
 import type { Member } from "/@/api/member/model";
 import { Api } from "/@/api/product";
@@ -1032,9 +1038,12 @@ const handleOpenProductModal = (index) => {
 };
 
 const handleComfirmChooseProduct = () => {
-  homePageContent.value.introductionItems[introductionItemIndex.value].product =
-    selectedProduct;
-  selectedProduct;
+  if (homePageContent.value && selectedProduct.value) {
+    homePageContent.value.introductionItems[
+      introductionItemIndex.value
+    ].product = selectedProduct.value;
+  }
+
   productModal.value = false;
 };
 
@@ -1042,9 +1051,11 @@ const handleOpenMemberModal = async () => {
   memberModal.value = true;
   await fetchMemberList(true);
   if (activeKey.value == TabType.Home) {
-    selectedMembers.value = [...homePageContent.value.leaders];
+    if (homePageContent.value) {
+      selectedMembers.value = [...homePageContent.value.leaders];
+    }
   } else if (activeKey.value == TabType.AboutUs) {
-    selectedMembers.value = [...aboutUs.value.teamMembers];
+    selectedMembers.value = aboutUs.value?.teamMembers || [];
   }
 };
 
@@ -1108,9 +1119,13 @@ const handleChooseProduct = (product: Product) => {
 
 const handleComfirmChooseMember = () => {
   if (activeKey.value == TabType.Home) {
-    homePageContent.value.leaders = [...selectedMembers.value];
+    if (homePageContent.value) {
+      homePageContent.value.leaders = [...selectedMembers.value];
+    }
   } else if (activeKey.value == TabType.AboutUs) {
-    aboutUs.value.teamMembers = [...selectedMembers.value];
+    if (aboutUs.value) {
+      aboutUs.value.teamMembers = [...selectedMembers.value] || [];
+    }
   }
   memberModal.value = false;
 };
@@ -1130,14 +1145,20 @@ const fetchHomePageData = async () => {
     loading.value = true;
     const res = await getHomePageApi();
     if (res) {
-      const tempData = { ...res };
-      tempData.processItems = tempData.processItems.map((item) => {
+      let tempData: HomePageContentVO = {
+        introductionItems: [],
+        processItems: [],
+        productCategoryItems: [],
+        clientLogos: [],
+        leaders: [],
+      };
+      tempData.processItems = res.processItems.map((item) => {
         return {
           ...item,
           image: convertImageUrlToUploadParam(item.image),
         };
       });
-      tempData.introductionItems = tempData.introductionItems.map((item) => {
+      tempData.introductionItems = res.introductionItems.map((item) => {
         return {
           ...item,
           image: convertImageUrlToUploadParam(item.image),
@@ -1145,15 +1166,20 @@ const fetchHomePageData = async () => {
       });
       console.log(tempData.introductionItems);
 
-      tempData.productCategoryItems = tempData.productCategoryItems.map(
-        (item) => {
+      tempData.productCategoryItems = res.productCategoryItems.map(
+        (item): HomeProductionCategoryItemVO => {
+          // return {
+          //   ...item,
+          //   image: convertImageUrlToUploadParam(item.image),
+          // } ;
           return {
-            ...item,
+            title: item.title,
+            category: item.category,
             image: convertImageUrlToUploadParam(item.image),
           };
         },
       );
-      tempData.clientLogos = convertImageUrlToUploadParam(tempData.clientLogos);
+      tempData.clientLogos = convertImageUrlToUploadParam(res.clientLogos);
 
       homePageContent.value = tempData;
       console.log(homePageContent.value);
@@ -1187,13 +1213,21 @@ const fetchAboutUs = async () => {
     loading.value = true;
     const res = await getAboutUsApi();
     if (res) {
-      const tempData = { ...res };
-      tempData.qualityItems = tempData.qualityItems.map((item) => {
-        return {
-          ...item,
-          image: convertImageUrlToUploadParam(item.image),
-        };
-      });
+      const tempData: AboutUsPageVO = {
+        qualityItems: [],
+        needHelpHeader: "",
+        needHelpDesc: "",
+        teamMembers: [],
+      };
+      tempData.qualityItems = res.qualityItems.map(
+        (item): AboutUsQualityItemVO => {
+          return {
+            title: item.title,
+            desc: item.desc,
+            image: convertImageUrlToUploadParam(item.image),
+          };
+        },
+      );
       aboutUs.value = tempData;
       console.log(aboutUs.value);
 
@@ -1207,26 +1241,29 @@ const fetchAboutUs = async () => {
 };
 
 const handleDeleteQualityItem = (index) => {
-  aboutUs.value.qualityItems.splice(index, 1);
+  aboutUs.value && aboutUs.value.qualityItems.splice(index, 1);
 };
 
 const addNewQualityItem = () => {
-  aboutUs.value.qualityItems.push({
-    title: "",
-    desc: "",
-    image: [],
-  });
+  aboutUs.value &&
+    aboutUs.value.qualityItems.push({
+      title: "",
+      desc: "",
+      image: [],
+    });
 };
 
 const addNewProcessItem = () => {
-  homePageContent.value.processItems.push({
-    title: "",
-    detailText: "",
-    image: [],
-  });
+  homePageContent.value &&
+    homePageContent.value.processItems.push({
+      title: "",
+      detailText: "",
+      image: [],
+    });
 };
 const addNewProductCategoryItem = () => {
-  homePageContent.value.processItems.push({
+  debugger;
+  homePageContent.value?.productCategoryItems.push({
     title: "",
     category: "",
     image: [],
@@ -1234,19 +1271,22 @@ const addNewProductCategoryItem = () => {
 };
 
 const handleDeleteTeamMember = (index) => {
-  aboutUs.value.teamMembers.splice(index, 1);
+  aboutUs.value && aboutUs.value.teamMembers.splice(index, 1);
 };
 const handleDeleteLeader = (index) => {
-  homePageContent.value.leaders.splice(index, 1);
+  homePageContent.value && homePageContent.value.leaders.splice(index, 1);
 };
 const handleDeleteProcessItem = (index) => {
-  homePageContent.value.processItems.splice(index, 1);
+  homePageContent.value && homePageContent.value.processItems.splice(index, 1);
 };
 const handleDeleteProduct = (index) => {
-  homePageContent.value.introductionItems[index].product = null;
+  if (homePageContent.value) {
+    homePageContent.value.introductionItems[index].product = undefined;
+  }
 };
 const handleDeleteProductCategoryItem = (index) => {
-  homePageContent.value.productCategoryItems.splice(index, 1);
+  homePageContent.value &&
+    homePageContent.value.productCategoryItems.splice(index, 1);
 };
 
 const handleHomeFinish = async () => {
@@ -1258,33 +1298,35 @@ const handleHomeFinish = async () => {
   try {
     loading.value = true;
     let params: HomePageContentDTO = {
-      processItems: homePageContent.value.processItems.map((item) => {
-        return {
-          ...item,
-          image: convertImageUploadParamToUrl(item.image),
-        };
-      }),
-      introductionItems: homePageContent.value.introductionItems.map((item) => {
-        const tempData = { ...item };
-        delete tempData.product;
-        return {
-          ...tempData,
-          image: convertImageUploadParamToUrl(item.image),
-          productId: item.product.id,
-        };
-      }),
-      productCategoryItems: homePageContent.value.productCategoryItems.map(
-        (item) => {
+      processItems: homePageContent.value.processItems.map(
+        (item): HomeProcessItem => {
           return {
             ...item,
-            image: convertImageUploadParamToUrl(item.image),
+            image: convertImageUploadParamToUrl(item.image) as string,
           };
         },
       ),
-      leaders: homePageContent.value.leaders.map((item) => item.id),
+      introductionItems: homePageContent.value.introductionItems.map(
+        (item): HomeIntroductionItemDTO => {
+          return {
+            ...item,
+            image: convertImageUploadParamToUrl(item.image) as string,
+            productId: item.product?.id,
+          };
+        },
+      ),
+      productCategoryItems: homePageContent.value.productCategoryItems.map(
+        (item): HomeProductionCategoryItem => {
+          return {
+            ...item,
+            image: convertImageUploadParamToUrl(item.image) as string,
+          };
+        },
+      ),
+      leaders: homePageContent.value.leaders.map((item) => item.id) as number[],
       clientLogos: convertImageUploadParamToUrl(
         homePageContent.value.clientLogos,
-      ),
+      ) as string[],
     };
     const res = await updateHomePageApi(params);
     if (res) {
@@ -1322,13 +1364,15 @@ const handleAboutUsFinish = async () => {
     loading.value = true;
     const params: AboutUsPageDTO = {
       ...aboutUs.value,
-      qualityItems: aboutUs.value.qualityItems.map((item) => {
-        return {
-          ...item,
-          image: convertImageUploadParamToUrl(item.image),
-        };
-      }),
-      teamMembers: aboutUs.value.teamMembers.map((item) => item.id),
+      qualityItems: aboutUs.value.qualityItems.map(
+        (item): AboutUsQualityItem => {
+          return {
+            ...item,
+            image: convertImageUploadParamToUrl(item.image) as string,
+          };
+        },
+      ),
+      teamMembers: aboutUs.value.teamMembers.map((item) => item.id) as number[],
     };
     console.log(params, "about us params");
     const res = await updateAboutUsApi(params);

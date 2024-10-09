@@ -73,7 +73,7 @@ export type HomePageContent = {
 
 export type HomePageContentDTO = {
   processItems: HomeProcessItem[];
-  introductionItems: HomeIntroductionItem[];
+  introductionItems: HomeIntroductionItemDTO[];
   productCategoryItems: HomeProductionCategoryItem[];
   leaders: number[];
   clientLogos: string[];
@@ -86,14 +86,41 @@ export type HomeIntroductionItem = {
   image: string;
   infoRight: IntroductionInfo;
   infoLeft: IntroductionInfo;
-  productId: number;
+  product: Product;
+};
+
+export type HomeIntroductionItemDTO = {
+  title: string;
+  subTitle: string;
+  description: string;
+  image: string;
+  infoRight: IntroductionInfo;
+  infoLeft: IntroductionInfo;
+  productId?: number;
+};
+
+export type HomeIntroductionItemVO = {
+  title: string;
+  subTitle: string;
+  description: string;
+  image: UploadProps["fileList"] | UploadFile[];
+  infoRight: IntroductionInfo;
+  infoLeft: IntroductionInfo;
+  product?: Product;
 };
 
 export type HomeProcessItem = {
-  title: number;
+  title: string;
   image: string;
   detailText: string;
 };
+
+export type HomeProcessItemVO = {
+  title: string;
+  image: UploadProps["fileList"] | UploadFile[];
+  detailText: string;
+};
+
 export type IntroductionInfo = {
   info: string;
   supplementary: string;
@@ -105,34 +132,18 @@ export type HomeProductionCategoryItem = {
   category: string;
 };
 
+export type HomeProductionCategoryItemVO = {
+  title: string;
+  image: UploadProps["fileList"];
+  category: string;
+};
+
 export type HomePageContentVO = {
   processItems: HomeProcessItemVO[];
   introductionItems: HomeIntroductionItemVO[];
   productCategoryItems: HomeProductionCategoryItemVO[];
   leaders: Member[];
-  clientLogos: UploadProps["fileList"] | UploadFile[];
-};
-
-export type HomeIntroductionItemVO = {
-  title: string;
-  subTitle: string;
-  description: string;
-  image: UploadProps["fileList"] | UploadFile[];
-  infoRight: IntroductionInfo;
-  infoLeft: IntroductionInfo;
-  product: Product;
-};
-
-export type HomeProcessItemVO = {
-  title: number;
-  image: UploadProps["fileList"] | UploadFile[];
-  detailText: string;
-};
-
-export type HomeProductionCategoryItemVO = {
-  title: number;
-  image: UploadProps["fileList"] | UploadFile[];
-  category: string;
+  clientLogos: UploadProps["fileList"];
 };
 
 export type AboutUsPage = {

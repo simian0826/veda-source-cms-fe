@@ -5,6 +5,7 @@ import {
   BasicInfo,
   HeroSection,
   HomePageContent,
+  HomePageContentDTO,
 } from "/@/api/model/baseModel";
 
 export enum Api {
@@ -58,7 +59,7 @@ export const getHomePageApi = async () => {
   });
 };
 
-export const updateHomePageApi = async (params: HomePageContent) => {
+export const updateHomePageApi = async (params: HomePageContentDTO) => {
   return defHttp.post<boolean>({
     url: Api.UpdateHomePage,
     params,

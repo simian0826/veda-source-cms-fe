@@ -5,7 +5,7 @@ export enum PageEnum {
   SSO_LOGIN = "/ssoLogin",
   // basic home path
   // BASE_HOME = "/dashboard/index",
-  BASE_HOME = "/product",
+  BASE_HOME = "/general/settings",
   // product
   PRODUCT_PAGE = "/product",
   // error page path
