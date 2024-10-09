@@ -1179,6 +1179,7 @@ const fetchHomePageData = async () => {
           };
         },
       );
+      tempData.leaders = res.leaders;
       tempData.clientLogos = convertImageUrlToUploadParam(res.clientLogos);
 
       homePageContent.value = tempData;
