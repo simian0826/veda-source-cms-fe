@@ -1262,7 +1262,6 @@ const addNewProcessItem = () => {
     });
 };
 const addNewProductCategoryItem = () => {
-  debugger;
   homePageContent.value?.productCategoryItems.push({
     title: "",
     category: "",
