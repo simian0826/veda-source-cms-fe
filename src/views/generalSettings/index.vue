@@ -582,7 +582,7 @@
                           <Textarea
                             v-model:value="item.desc"
                             placeholder="please enter"
-                            :autoSize="{ minRows: 3, maxRows: 6 }"
+                            :autoSize="{ minRows: 3, maxRows: 3 }"
                           />
                         </FormItem>
 
@@ -1124,7 +1124,7 @@ const handleComfirmChooseMember = () => {
     }
   } else if (activeKey.value == TabType.AboutUs) {
     if (aboutUs.value) {
-      aboutUs.value.teamMembers = [...selectedMembers.value] || [];
+      aboutUs.value.teamMembers = [...selectedMembers.value];
     }
   }
   memberModal.value = false;

@@ -26,9 +26,9 @@ const { Content } = Layout;
 </script>
 <style scoped lang="less">
 .page-content {
-  max-height: calc(100vh - 2rem - 102px);
-  height: calc(100vh - 2rem - 102px);
-  overflow-y: scroll;
+  max-height: calc(100vh - 2rem - 82px);
+  height: calc(100vh - 2rem - 82px);
+  overflow-y: auto;
 }
 #components-layout-demo-side .logo {
   height: 32px;
