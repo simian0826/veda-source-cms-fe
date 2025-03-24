@@ -101,4 +101,10 @@ export function useModalDragMove(context: UseModalDragMoveContext) {
     }
     setTimeout(handleDrag, 30);
   });
+
+  return {
+    open: context.open,
+    draggable: context.draggable,
+    destroyOnClose: context.destroyOnClose,
+  };
 }
