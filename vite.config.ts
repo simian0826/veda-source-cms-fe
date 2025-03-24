@@ -20,10 +20,11 @@ export default ({ mode }: ConfigEnv): UserConfigExport => {
 
   const {
     VITE_USE_MOCK,
+    VITE_PUBLIC_PATH,
     //VITE_GLOB_API_URL_PREFIX
   } = loadEnv(mode, root);
   return {
-    base: "/",
+    base: VITE_PUBLIC_PATH,
     // base: root,
     build: {
       rollupOptions: {
