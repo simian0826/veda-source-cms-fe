@@ -1,6 +1,6 @@
-import type { GlobEnvConfig } from "/#/config";
+// import type { GlobEnvConfig } from "/#/config";
 import pkg from "../../package.json";
-import { API_ADDRESS } from "/@/enums/cacheEnum";
+// import { API_ADDRESS } from "/@/enums/cacheEnum";
 
 export function getCommonStoragePrefix() {
   const { VITE_GLOB_APP_TITLE } = getAppEnvConfig();
@@ -15,19 +15,19 @@ export function getStorageShortName() {
   return `${getCommonStoragePrefix()}${`__${pkg.version}`}__`.toUpperCase();
 }
 
-const getVariableName = (title: string) => {
-  function strToHex(str: string) {
-    const result: string[] = [];
-    for (let i = 0; i < str.length; ++i) {
-      const hex = str.charCodeAt(i).toString(16);
-      result.push(("000" + hex).slice(-4));
-    }
-    return result.join("").toUpperCase();
-  }
-  return `__PRODUCTION__${strToHex(title) || "__APP"}__CONF__`
-    .toUpperCase()
-    .replace(/\s/g, "");
-};
+// const getVariableName = (title: string) => {
+//   function strToHex(str: string) {
+//     const result: string[] = [];
+//     for (let i = 0; i < str.length; ++i) {
+//       const hex = str.charCodeAt(i).toString(16);
+//       result.push(("000" + hex).slice(-4));
+//     }
+//     return result.join("").toUpperCase();
+//   }
+//   return `__PRODUCTION__${strToHex(title) || "__APP"}__CONF__`
+//     .toUpperCase()
+//     .replace(/\s/g, "");
+// };
 
 // export function getAppEnvConfig() {
 //   const ENV_NAME = "_APP_CONFIG_";
