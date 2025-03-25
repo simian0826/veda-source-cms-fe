@@ -23,6 +23,7 @@ export default ({ mode }: ConfigEnv): UserConfigExport => {
     VITE_PUBLIC_PATH,
     //VITE_GLOB_API_URL_PREFIX
   } = loadEnv(mode, root);
+  console.log("VITE_PUBLIC_PATH", VITE_PUBLIC_PATH);
   return {
     base: VITE_PUBLIC_PATH,
     // base: root,
